@@ -19,7 +19,8 @@ class CatanGame(PygameGame):
 
     def redrawAll(self, screen):
         if (self._debugMenu):
-            self.drawMenu(screen)
+            #self.drawMenu(screen)
+            pass
         if (self._debugBoard):
             # self.drawGUI(screen)
             self.drawBoard(screen)
@@ -48,6 +49,7 @@ class CatanGame(PygameGame):
         return (x > x0 and x < x1 and y > y0 and y < y1)
     
     def drawBoard(self, screen):
+        pass
 
 
 

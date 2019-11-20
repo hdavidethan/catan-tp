@@ -59,4 +59,19 @@ def getAdjacencyInDirection(referencePos, direction, r=5, q=5):
     # Only returns a value if there exists a hex in specified direction
     if (newRow < r and newCol < q and newRow >= 0 and newCol >= 0 and
         generateAxialList(r, q)[newRow][newCol] != None):
-        return (newRow, newCol), (direction + 3) % 6
+        adjDirection = (direction + 3) % 6
+        adjNodes = (adjDirection, (adjDirection + 1) % 6)
+        return (newRow, newCol), adjDirection, adjNodes
+
+
+def getNodeInDirection(referencePos, direction):
+    adj = getAdjacencyInDirection(referencePos, direction)
+    if (adj is not None):
+        adjEdge = adj[1]
+        adjNode = (adjEdge, (adjEdge + 1) % 6)
+        if (direction > adjEdge):
+            return (adj[2][1], adjNode[0])
+        else:
+            return (adj[2][0], adjNode[1])
+
+        
