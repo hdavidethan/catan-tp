@@ -4,7 +4,7 @@ from config.colors import Colors
 import pygame
 
 class Button(Element):
-    def __init__(self, pos, size, color, radius=0):
+    def __init__(self, pos, size, text, color, radius=0):
         super().__init__(pos, size)
         self.radius = radius
         self.color = color
