@@ -52,6 +52,7 @@ class Board(object):
                             edgeCounter += 1
         self.hexBoard = tmpBoard
 
+    # Generate the nodes for assignment
     def generateNodes(self):
         # Nodes with ports:
         ports = {2:1, 6:1, 10:2, 11:2, 22:3, 23:3, 37:4, 45:4, 52:5, 53:5, 47:6,
@@ -66,51 +67,25 @@ class Board(object):
             else:
                 self.nodes.append(Node(i))
 
+    # Assign the nodes to the board (TEMPORARY!!)
     def assignNodes(self):
-        nodeCounter = 0
+        assignment = [[0,1,2,3,4,5],[2,6,7,8,9,3],[7,10,11,12,13,8],
+                      [14,5,4,15,16,17],[4,3,9,18,19,15],[9,8,13,20,21,18],[13,12,22,23,24,20],
+                      [25,17,16,26,27,28],[16,15,19,29,30,26],[19,18,21,31,32,29],[21,20,24,33,34,31],[24,23,35,36,37,33],
+                      [27,26,30,38,39,40],[30,29,32,41,42,38],[32,31,34,43,44,41],[34,33,37,45,46,43],
+                      [39,38,42,47,48,49],[42,41,44,50,51,47],[44,43,46,52,53,50]]
+        tileCounter = 0
         tmpBoard = copy.deepcopy(self.hexBoard)
         for row in range(len(self.hexBoard)):
             for col in range(len(self.hexBoard[0])):
                 if (self.hexBoard[row][col] != None):
                     tile = tmpBoard[row][col]
-                    createdDirs = [0, 1, 2, 5] # Directions that probably exist
-                    while len(tile.nodes) < 6:
-                        i = len(tile.nodes)
-                        check = getAdjacencyInDirection((row, col), i)
-                        if (check == None):
-                            adj = getAdjacencyInDirection((row, col), (i-1)%6)
-                            adjNodes = getNodeInDirection((row, col), (i-1)%6)
-                        elif (i != 5):
-                            adj = getAdjacencyInDirection((row, col), (i-1)%6)
-                            adjRow, adjCol = adj[0]
-                            checkLength = len(tmpBoard[adjRow][adjCol].nodes)
-                            if (checkLength == 0):
-                                adjNodes = getNodeInDirection((row, col), (i-1)%6)
-                            else:
-                                adj = getAdjacencyInDirection((row, col), i)
-                                adjNodes = getNodeInDirection((row, col), i)
-                        else:
-                            adj = getAdjacencyInDirection((row, col), i)
-                            adjNodes = (5, 3)
-                        # Copies Edge object for adjacent sides.
-                        if (i in createdDirs and adjNodes != None and adj != None):
-                            adjRow, adjCol = adj[0]
-                            node = adjNodes[1]
-                            if (len(tmpBoard[adjRow][adjCol].nodes) != 0):
-                                toAdd = tmpBoard[adjRow][adjCol].nodes[node]
-                                tile.nodes.append(toAdd)
-                            else:
-                                toAdd = self.nodes[nodeCounter]
-                                tile.nodes.append(toAdd)
-                                nodeCounter += 1
-                        # Assigns new edges
-                        else:
-                            toAdd = self.nodes[nodeCounter]
-                            tile.nodes.append(toAdd)
-                            nodeCounter += 1
-                    print((row,col),tile.nodes)
+                    for i in assignment[tileCounter]:
+                        tile.nodes.append(self.nodes[i])
+                    tileCounter += 1
         self.hexBoard = tmpBoard
 
+    # Assign types to each Tile on the board
     def assignTypes(self):
         resources = (['desert'] + ['hills'] * 3 + ['forest'] * 4 +
                     ['mountains'] * 3 + ['pasture'] * 4 + ['fields'] * 4)
@@ -120,6 +95,7 @@ class Board(object):
                 if (self.hexBoard[row][col] != None):
                     self.hexBoard[row][col].type = resources.pop()
 
+    # Assign number tokens to each Tile on the board
     def assignNumbers(self):
         # Default Catan order with first as last index (reversed)
         number = [11, 3, 6, 5, 4, 9, 10, 8, 4, 11, 12, 9, 10, 8, 3, 6, 2, 5]
