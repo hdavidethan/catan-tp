@@ -1,4 +1,7 @@
-from axial import *
+from resources.game.axial import *
+from resources.game.node import Node
+from resources.game.tile import Tile
+from resources.game.edge import Edge
 import copy, random
 
 class Board(object):
@@ -106,39 +109,3 @@ class Board(object):
         for r, q in order:
             if (self.hexBoard[r][q].type != 'desert'):
                 self.hexBoard[r][q].number = number.pop()
-
-class Tile(object):
-    def __init__(self, r, q):
-        self.pos = (r, q)
-        self.number = None
-        self.edges = []
-        self.nodes = []
-        self.type = None
-
-    def __repr__(self):
-        r = self.pos[0]
-        q = self.pos[1]
-        return f'<{self.type} Tile [{self.number}] at ({r}, {q})>'
-
-class Edge(object):
-    def __init__(self, id):
-        self.road = None
-        self.id = id
-    
-    def __repr__(self):
-        return f'<Edge at id [{self.id}]>'
-    
-    def __eq__(self, other):
-        return isinstance(other, Edge) and self.id == other.id
-
-    def __hash__(self):
-        return hash(self.id)
-
-class Node(object):
-    def __init__(self, id, port=None):
-        self.id = id
-        self.port = port
-        self.nodeLevel = None # 1 and 2 for settlement and city
-    def __repr__(self):
-        port = f'with Port {self.port}' if self.port != None else 'without a port' 
-        return f'<Node at id [{self.id}], {port}>'

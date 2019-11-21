@@ -1,3 +1,3 @@
 class windowConfig(object):
-    width = 600
-    height = 600
+    width = 900
+    height = 780

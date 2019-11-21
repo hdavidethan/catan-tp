@@ -1,4 +1,6 @@
-from catan import *
+from resources.game.node import Node
+from resources.game.tile import Tile
+from resources.game.edge import Edge
 import math
 
 # Creates a list representing a hexagonal grid given axial dimensions r x q.
