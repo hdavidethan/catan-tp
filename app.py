@@ -15,26 +15,53 @@ class CatanGame(PygameGame):
     def init(self):
         self.boardSize = min(self.width*0.7, self.height*0.7)
         self.board = Board()
-        self._debugMenu = False
-        self._debugBoard = True
+        self.elements = set()
+        self.activeMode = None
+        self.setActiveMode('menu')
+    
+    def setActiveMode(self, mode):
+        if (mode == 'menu'):
+            self.initMenu()
+            self.activeMode = 'menu'
+        elif (mode == 'game'):
+            self.initGame()
+            self.activeMode = 'game'
+
+    def initMenu(self):
+        self.elements = set()
+        menuButtonColors = [Colors.GOLD_1, Colors.GOLD_2]
+        menuButton1 = Button(windowConfig.MENU_B1, windowConfig.MENU_B1_SIZE, 'Start Game', menuButtonColors, 0.4)
+        self.elements.add(menuButton1)
+    
+    def initGame(self):
+        self.elements = set()
 
     def keyPressed(self, key, mod):
-        if (key == pygame.K_m):
-            self._debugMenu = not self._debugMenu
-        elif (key == pygame.K_r):
-            self.board = Board()
+        if (self.activeMode == 'game'):
+            if (key == pygame.K_m):
+                self.activeMode = 'menu'
+            elif (key == pygame.K_r):
+                self.board = Board()
+        
+    def mousePressed(self, mx, my):
+        for element in self.elements:
+            x0, y0, width, height = element.getRectArgs()
+            x1 = x0 + width
+            y1 = y0 + height
+            if (mx > x0 and mx < x1 and my > y0 and my < y1):
+                element.onClick(self)
 
     def redrawAll(self, screen):
-        if (self._debugMenu):
+        if (self.activeMode == 'menu'):
             self.drawMenu(screen)
-            pass
-        if (self._debugBoard):
+
+        if (self.activeMode == 'game'):
             # self.drawGUI(screen)
             self.drawBoard(screen)
 
     def drawMenu(self, screen):
-        #button1 = Button((100))
-        pass
+        for element in self.elements:
+            element.draw(screen)
 
     def inBounds(self, pos, bounds):
         x, y = pos
@@ -68,15 +95,19 @@ class CatanGame(PygameGame):
                 gfxdraw.aapolygon(screen, self.getHexagonPoints((x0, y0, x1, y1)), Colors.BLACK)
 
                 # Draw Token
+                center = (int(x0 + (x1-x0)/2), int(y0 + (y1-y0)/2))
+                tokenSize = int(0.17 * hexHeight)
                 number = self.board.hexBoard[i][j+firstIndex].number
                 if (number != None):
+                    pygame.draw.circle(screen, Colors.WHITE, center, tokenSize)
+                    gfxdraw.aacircle(screen, center[0], center[1], tokenSize, Colors.BLACK)
                     if (number in [6, 8]):
                         tokenColor = Colors.BLACK
                     else:
                         tokenColor = Colors.BLACK
                     token = Text.TOKEN_FONT.render(str(number), True, tokenColor)
                     tokenSurf = token.get_rect()
-                    tokenSurf.center = (x0 + (x1-x0)/2, y0 + (y1-y0)/2)
+                    tokenSurf.center = center
                     screen.blit(token, tokenSurf)
 
     def getHexagonPoints(self, bounds):
@@ -99,4 +130,4 @@ class CatanGame(PygameGame):
         tileFill = colors[tile.type]
         return tileFill
 
-CatanGame(width=windowConfig.width, height=windowConfig.height, title='Catan: The Settlers of Python').run()
+CatanGame(width=windowConfig.WIDTH, height=windowConfig.HEIGHT, title='Catan: The Settlers of Python').run()
