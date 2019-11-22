@@ -1,5 +1,5 @@
-from element import Element
-from resources.roundedRect import drawRoundedRect
+from resources.gui.element import Element
+from resources.gui.roundedRect import drawRoundedRect
 from config.colors import Colors
 import pygame
 
