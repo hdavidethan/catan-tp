@@ -71,6 +71,7 @@ class CatanGame(PygameGame):
         x0, y0, x1, y1 = bounds
         return (x > x0 and x < x1 and y > y0 and y < y1)
     
+    # Draws the Catan Board
     def drawBoard(self, screen):
         cx, cy = self.width/2, self.height/2
         heightToWidthRatio = 32 / 35
@@ -86,8 +87,9 @@ class CatanGame(PygameGame):
                 row.remove(None)
             firstIndex = self.board.hexBoard[i].index(row[0])
             rowLen = len(row)
-            for j in range(rowLen):
-                hexFill = self.getFill(self.board.hexBoard[i][j+firstIndex])
+            for j in range(rowLen): 
+                tile = self.board.hexBoard[i][j+firstIndex]
+                hexFill = self.getFill(tile)
                 leftOffset = ((self.board.q - rowLen) / 2) * hexWidth + boardBounds[0]
                 x0 = leftOffset + j * hexWidth
                 x1 = leftOffset + (j + 1) * hexWidth
@@ -99,6 +101,38 @@ class CatanGame(PygameGame):
                 self.drawPorts(screen, (i, j+firstIndex), hexPoints, center)
                 gfxdraw.aapolygon(screen, hexPoints, Colors.BLACK)
                 self.drawTokens(screen, hexHeight, (i, j+firstIndex), center)
+                self.drawRoads(screen, tile, hexPoints)
+                self.drawNodes(screen, hexHeight, tile, hexPoints)
+
+    def drawRoads(self, screen, tile, hexPoints):
+        edgeIndex = 0
+        for edge in tile.edges:
+            if (edge.road != None):
+                point1 = hexPoints[edgeIndex]
+                point2 = hexPoints[(edgeIndex+1)%6]
+                roadOwner = edge.road
+                roadArgs = CatanMath.getThickAALine(point1, point2)
+                gfxdraw.filled_polygon(screen, roadArgs, Colors.BLACK)
+                gfxdraw.aapolygon(screen, roadArgs, Colors.BLACK)
+            edgeIndex += 1
+
+    def drawNodes(self, screen, hexHeight, tile, hexPoints):
+        nodeIndex = 0
+        nodeSize = int(0.1 * hexHeight)
+        for node in tile.nodes:
+            if (node.nodeLevel != None):
+                number = node.nodeLevel
+                center = hexPoints[nodeIndex]
+                cx, cy = center
+                cx, cy = int(cx), int(cy)
+                pygame.draw.circle(screen, Colors.WHITE, (cx, cy), nodeSize)
+                gfxdraw.aacircle(screen, cx, cy, nodeSize, Colors.BLACK)
+                nodeText = Text.NODE_FONT.render(str(number), True, Colors.BLACK)
+                nodeSurf = nodeText.get_rect()
+                nodeSurf.center = (cx, cy)
+                screen.blit(nodeText, nodeSurf)
+            nodeIndex += 1
+
 
     def drawTokens(self, screen, hexHeight, pos, center):
         i, j = pos

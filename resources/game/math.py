@@ -25,4 +25,32 @@ class CatanMath(object):
         point5 = (x0+width/2, y1)
         point6 = (x0, y0 + 3*height/4)
         return [point1, point2, point3, point4, point5, point6]
+    
+    # Get the dimensions of a thick anti-aliased line
+    # Based on solution by Yannis Assael
+    # https://stackoverflow.com/questions/30578068/pygame-draw-anti-aliased-thick-line
+    @staticmethod
+    def getThickAALine(point1, point2, thickness=3):
+        x1, y1 = point1
+        x2, y2 = point2
+        cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+        length = CatanMath.distance(point1, point2)
+        angle = math.atan2(y1-y2, x1-x2)
+        # Dimension calculations
+        upperLeft = (cx + (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
+                    cy + (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
+        upperRight = (cx - (length / 2.) * math.cos(angle) - (thickness / 2.) * math.sin(angle),
+                    cy + (thickness / 2.) * math.cos(angle) - (length / 2.) * math.sin(angle))
+        bottomLeft = (cx + (length / 2.) * math.cos(angle) + (thickness / 2.) * math.sin(angle),
+                    cy - (thickness / 2.) * math.cos(angle) + (length / 2.) * math.sin(angle))
+        bottomRight = (cx - (length / 2.) * math.cos(angle) + (thickness / 2.) * math.sin(angle),
+                    cy - (thickness / 2.) * math.cos(angle) - (length / 2.) * math.sin(angle))
+        return (upperLeft, upperRight, bottomRight, bottomLeft)
+
+    @staticmethod
+    def distance(point1, point2):
+        x1, y1 = point1
+        x2, y2 = point2
+        return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+
         
