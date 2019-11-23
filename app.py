@@ -6,9 +6,7 @@ from resources.game.board import Board
 from config.colors import Colors
 from config.config import windowConfig
 from config.text import Text
-
-# TODO: Make Buttons OOPy
-# TODO: Create Board Representation
+from resources.game.math import CatanMath
 
 class CatanGame(PygameGame):
     # Run on app init
@@ -58,8 +56,11 @@ class CatanGame(PygameGame):
             self.drawMenu(screen)
 
         if (self.activeMode == 'game'):
-            # self.drawGUI(screen)
-            self.drawBoard(screen)
+            self.drawGame(screen)
+
+    def drawGame(self, screen):
+        # self.drawGUI(screen)
+        self.drawBoard(screen)
 
     def drawMenu(self, screen):
         for element in self.elements:
@@ -92,37 +93,58 @@ class CatanGame(PygameGame):
                 x1 = leftOffset + (j + 1) * hexWidth
                 y0 = i * ySpacing + boardBounds[1]
                 y1 = y0 + hexHeight
-                pygame.draw.polygon(screen, hexFill, 
-                    self.getHexagonPoints((x0, y0, x1, y1)))
-                gfxdraw.aapolygon(screen, self.getHexagonPoints((x0, y0, x1, y1)), Colors.BLACK)
-
-                # Draw Token
                 center = (int(x0 + (x1-x0)/2), int(y0 + (y1-y0)/2))
-                tokenSize = int(0.17 * hexHeight)
-                number = self.board.hexBoard[i][j+firstIndex].number
-                if (number != None):
-                    pygame.draw.circle(screen, Colors.WHITE, center, tokenSize)
-                    gfxdraw.aacircle(screen, center[0], center[1], tokenSize, Colors.BLACK)
-                    if (number in [6, 8]):
-                        tokenColor = Colors.BLACK
-                    else:
-                        tokenColor = Colors.BLACK
-                    token = Text.TOKEN_FONT.render(str(number), True, tokenColor)
-                    tokenSurf = token.get_rect()
-                    tokenSurf.center = center
-                    screen.blit(token, tokenSurf)
+                hexPoints = CatanMath.getHexagonPoints((x0, y0, x1, y1))
+                pygame.draw.polygon(screen, hexFill, hexPoints)
+                self.drawPorts(screen, (i, j+firstIndex), hexPoints, center)
+                gfxdraw.aapolygon(screen, hexPoints, Colors.BLACK)
+                self.drawTokens(screen, hexHeight, (i, j+firstIndex), center)
 
-    def getHexagonPoints(self, bounds):
-        x0, y0, x1, y1 = bounds
-        width = x1 - x0
-        height = y1 - y0
-        point1 = (x0, y0 + height/4)
-        point2 = (x0+width/2, y0)
-        point3 = (x1, y0 + height/4)
-        point4 = (x1, y0 + 3*height/4)
-        point5 = (x0+width/2, y1)
-        point6 = (x0, y0 + 3*height/4)
-        return [point1, point2, point3, point4, point5, point6]
+    def drawTokens(self, screen, hexHeight, pos, center):
+        i, j = pos
+        tokenSize = int(0.17 * hexHeight)
+        number = self.board.hexBoard[i][j].number
+        if (number != None):
+            pygame.draw.circle(screen, Colors.WHITE, center, tokenSize)
+            gfxdraw.aacircle(screen, center[0], center[1], tokenSize, Colors.BLACK)
+            if (number in [6, 8]):
+                tokenColor = Colors.BLACK
+            else:
+                tokenColor = Colors.BLACK
+            token = Text.TOKEN_FONT.render(str(number), True, tokenColor)
+            tokenSurf = token.get_rect()
+            tokenSurf.center = center
+            screen.blit(token, tokenSurf)
+    
+    def drawPorts(self, screen, currentPos, hexPoints, center):
+        portLocations = [[(0,3), (0,1)], [(0,4), (1,2)], [(1,1), (0,1)],
+                        [(1,4), (2,3)], [(2,0), (0, 5)], [(3,0), (4,5)],
+                        [(3,3), (2,3)], [(4,1), (4,5)], [(4,2), (3,4)]]
+        portIndex = 0
+        for port in portLocations:
+            if (currentPos == port[0]):
+                pos, nodes = port
+                point1 = hexPoints[nodes[0]]
+                point2 = hexPoints[nodes[1]]
+                triangle = CatanMath.getEqTriangle(screen, point1, point2, center)
+                gfxdraw.aapolygon(screen, triangle, Colors.GOLD_1)
+                cx, cy = triangle[2]
+                cx, cy = int(cx), int(cy)
+                portSize = int(0.2 * self.boardSize / 4)
+                pygame.draw.circle(screen, Colors.WHITE, (cx, cy), portSize)
+                gfxdraw.aacircle(screen, cx, cy, portSize, Colors.BLACK)
+                portText = self.getPortText(portIndex)
+                portLabel = Text.PORT_FONT.render(portText, True, Colors.BLACK)
+                portSurf = portLabel.get_rect()
+                portSurf.center = (cx, cy)
+                screen.blit(portLabel, portSurf)
+            portIndex += 1
+    
+    def getPortText(self, portIndex):
+        port = self.board.ports[portIndex]
+        ports = {'wildcard':'? 3:1', 'lumber':'L 2:1', 'sheep':'S 2:1',
+                'grain':'G 2:1', 'brick':'B 2:1', 'ore':'O 2:1'}
+        return ports[port]
     
     def getFill(self, tile):
         colors = {'forest':Colors.FOREST, 'desert':Colors.DESERT,
