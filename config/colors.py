@@ -17,3 +17,9 @@ class Colors(object):
     HILLS = pygame.Color('0x9c1428')
     PASTURE = pygame.Color('0x94fa52')
     DESERT = pygame.Color('0xf2ee76')
+
+    # Player Colors
+    PLAYER_1 = pygame.Color('0xd0f2e3')
+    PLAYER_2 = pygame.Color('0x92140c')
+    PLAYER_3 = pygame.Color('0x002642')
+    PLAYER_4 = pygame.Color('0x8cb369')

@@ -29,10 +29,11 @@ class Button(Element):
         else:
             return self.colors[0]
     
+    # Handler for onClick events.
     def onClick(self, game):
         if (isinstance(self.binding, tuple)):
             if (self.binding[0] == 'changeMode'):
-                game.activeMode = self.binding[1]
+                game.setActiveMode(self.binding[1])
             elif (self.binding[0] == 'quit'):
                 game._running = False
     

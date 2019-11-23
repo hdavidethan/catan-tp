@@ -2,6 +2,7 @@ from resources.game.axial import *
 from resources.game.node import Node
 from resources.game.tile import Tile
 from resources.game.edge import Edge
+from resources.game.player import Player
 import copy, random
 
 class Board(object):
@@ -22,6 +23,8 @@ class Board(object):
 
         self.assignTypes()
         self.assignNumbers()
+
+        self.players = [Player(0), Player(1), Player(2), Player(3)]
     
     # Generates the Edge objects into a list.
     def generateEdges(self):

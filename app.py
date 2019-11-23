@@ -3,20 +3,29 @@ from pygame import gfxdraw
 from pygameFramework import PygameGame
 from resources.gui.button import Button
 from resources.game.board import Board
+from resources.game.math import CatanMath
+from resources.game.player import Player
+from resources.gui.scorecard import Scorecard
 from config.colors import Colors
 from config.config import windowConfig
 from config.text import Text
-from resources.game.math import CatanMath
 
 class CatanGame(PygameGame):
     # Run on app init
     def init(self):
-        self.boardSize = min(self.width*0.7, self.height*0.7)
-        self.board = Board()
+        self.boardSize = min(self.width*0.65, self.height*0.65)
+        self.resetGame()
         self.elements = set()
         self.activeMode = None
         self.setActiveMode('menu')
     
+    # Resets all game variables (Board, Player, etc.)
+    def resetGame(self):
+        self.board = Board()
+        self.turn = 0
+        self.currentPlayer = 0
+
+    # Sets the active mode of the app
     def setActiveMode(self, mode):
         if (mode == 'menu'):
             self.initMenu()
@@ -25,6 +34,7 @@ class CatanGame(PygameGame):
             self.initGame()
             self.activeMode = 'game'
 
+    # Runs upon Menu Mode activation/switch
     def initMenu(self):
         self.elements = set()
         menuButtonColors = [Colors.GOLD_1, Colors.GOLD_2]
@@ -33,16 +43,28 @@ class CatanGame(PygameGame):
         self.elements.add(menuButton1)
         self.elements.add(menuButton2)
     
+    # Runs upon Game Mode activation/switch
     def initGame(self):
         self.elements = set()
+        scores = [windowConfig.SCORE_1, windowConfig.SCORE_2, windowConfig.SCORE_3, windowConfig.SCORE_4]
+        scoreCounter = 0
+        for player in self.board.players:
+            self.elements.add(Scorecard(player, scores[scoreCounter], windowConfig.SCORE_SIZE))
+            scoreCounter += 1
 
+    # Handles keystrokes
     def keyPressed(self, key, mod):
         if (self.activeMode == 'game'):
             if (key == pygame.K_m):
                 self.activeMode = 'menu'
             elif (key == pygame.K_r):
                 self.board = Board()
-        
+    
+    def endTurn(self):
+        self.turn += 1
+        self.currentPlayer = self.turn % 4
+    
+    # Handles mouse presses
     def mousePressed(self, mx, my):
         for element in self.elements:
             x0, y0, width, height = element.getRectArgs()
@@ -51,6 +73,7 @@ class CatanGame(PygameGame):
             if (mx > x0 and mx < x1 and my > y0 and my < y1):
                 element.onClick(self)
 
+    # Redraws everything on the surface
     def redrawAll(self, screen):
         if (self.activeMode == 'menu'):
             self.drawMenu(screen)
@@ -58,19 +81,27 @@ class CatanGame(PygameGame):
         if (self.activeMode == 'game'):
             self.drawGame(screen)
 
+    # Draws the Game Mode components
     def drawGame(self, screen):
-        # self.drawGUI(screen)
+        self.drawGUI(screen)
         self.drawBoard(screen)
-
+    
+    # Draws the Menu Mode Components
     def drawMenu(self, screen):
         for element in self.elements:
             element.draw(screen)
 
+    # Checks if given position is within the bounds.
     def inBounds(self, pos, bounds):
         x, y = pos
         x0, y0, x1, y1 = bounds
         return (x > x0 and x < x1 and y > y0 and y < y1)
     
+    # Draws the GUI Components of the Game Mode
+    def drawGUI(self, screen):
+        for element in self.elements:
+            element.draw(screen)
+
     # Draws the Catan Board
     def drawBoard(self, screen):
         cx, cy = self.width/2, self.height/2
@@ -104,6 +135,7 @@ class CatanGame(PygameGame):
                 self.drawRoads(screen, tile, hexPoints)
                 self.drawNodes(screen, hexHeight, tile, hexPoints)
 
+    # Draws Roads on the Catan Board
     def drawRoads(self, screen, tile, hexPoints):
         edgeIndex = 0
         for edge in tile.edges:
@@ -116,6 +148,7 @@ class CatanGame(PygameGame):
                 gfxdraw.aapolygon(screen, roadArgs, Colors.BLACK)
             edgeIndex += 1
 
+    # Draws Nodes on the Catan Board
     def drawNodes(self, screen, hexHeight, tile, hexPoints):
         nodeIndex = 0
         nodeSize = int(0.1 * hexHeight)
@@ -133,7 +166,7 @@ class CatanGame(PygameGame):
                 screen.blit(nodeText, nodeSurf)
             nodeIndex += 1
 
-
+    # Draws Tokens on the Catan Board
     def drawTokens(self, screen, hexHeight, pos, center):
         i, j = pos
         tokenSize = int(0.17 * hexHeight)
@@ -150,6 +183,7 @@ class CatanGame(PygameGame):
             tokenSurf.center = center
             screen.blit(token, tokenSurf)
     
+    # Draws Ports on the Catan Board
     def drawPorts(self, screen, currentPos, hexPoints, center):
         portLocations = [[(0,3), (0,1)], [(0,4), (1,2)], [(1,1), (0,1)],
                         [(1,4), (2,3)], [(2,0), (0, 5)], [(3,0), (4,5)],
@@ -167,19 +201,21 @@ class CatanGame(PygameGame):
                 portSize = int(0.2 * self.boardSize / 4)
                 pygame.draw.circle(screen, Colors.WHITE, (cx, cy), portSize)
                 gfxdraw.aacircle(screen, cx, cy, portSize, Colors.BLACK)
-                portText = self.getPortText(portIndex)
+                portText = self.getPortContents(portIndex)
                 portLabel = Text.PORT_FONT.render(portText, True, Colors.BLACK)
                 portSurf = portLabel.get_rect()
                 portSurf.center = (cx, cy)
                 screen.blit(portLabel, portSurf)
             portIndex += 1
     
-    def getPortText(self, portIndex):
+    # Gets the contents of the Port Token
+    def getPortContents(self, portIndex):
         port = self.board.ports[portIndex]
         ports = {'wildcard':'? 3:1', 'lumber':'L 2:1', 'sheep':'S 2:1',
                 'grain':'G 2:1', 'brick':'B 2:1', 'ore':'O 2:1'}
         return ports[port]
     
+    # Gets the fill of each hex depending on the Tile type
     def getFill(self, tile):
         colors = {'forest':Colors.FOREST, 'desert':Colors.DESERT,
                   'hills':Colors.HILLS, 'mountains':Colors.MOUNTAINS,
