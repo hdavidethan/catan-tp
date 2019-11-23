@@ -30,8 +30,10 @@ class CatanGame(PygameGame):
     def initMenu(self):
         self.elements = set()
         menuButtonColors = [Colors.GOLD_1, Colors.GOLD_2]
-        menuButton1 = Button(windowConfig.MENU_B1, windowConfig.MENU_B1_SIZE, 'Start Game', menuButtonColors, 0.4)
+        menuButton1 = Button(windowConfig.MENU_B1,windowConfig.MENU_B1_SIZE, 'Start Game', menuButtonColors, ('changeMode', 'game'), 0.4)
+        menuButton2 = Button(windowConfig.MENU_B2, windowConfig.MENU_B2_SIZE, 'Quit Game', menuButtonColors, ('quit', None), 0.4)
         self.elements.add(menuButton1)
+        self.elements.add(menuButton2)
     
     def initGame(self):
         self.elements = set()

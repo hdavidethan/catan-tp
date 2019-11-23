@@ -4,11 +4,14 @@ from config.colors import Colors
 from config.text import Text
 import pygame
 
+# Valid Bindings: changeMode, quit, pause
+
 class Button(Element):
-    def __init__(self, pos, size, text, colors, radius=0):
+    def __init__(self, pos, size, text, colors, binding, radius=0):
         super().__init__(pos, size)
         self.text = text
         self.radius = radius
+        self.binding = binding
         self.colors = colors
     
     def __eq__(self, other):
@@ -27,7 +30,11 @@ class Button(Element):
             return self.colors[0]
     
     def onClick(self, game):
-        game.activeMode = 'game'
+        if (isinstance(self.binding, tuple)):
+            if (self.binding[0] == 'changeMode'):
+                game.activeMode = self.binding[1]
+            elif (self.binding[0] == 'quit'):
+                game._running = False
     
     def draw(self, screen):
         rectArgs = self.getRectArgs()
