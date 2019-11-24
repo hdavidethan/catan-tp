@@ -11,4 +11,5 @@ class Text(object):
     SCORE_FONT = pygame.font.Font("resources/assets/minion-regular.ttf", 20*sizeFactor)
     CURRENT_PLAYER_FONT = pygame.font.Font("resources/assets/minion-regular.ttf", 20*sizeFactor)
     BUTTON_FONT = pygame.font.Font("resources/assets/cabin-regular.ttf", 22*sizeFactor)
+    BUILD_FONT = pygame.font.Font("resources/assets/cabin-regular.ttf", 18*sizeFactor)
     RESOURCE_FONT = pygame.font.Font("resources/assets/minion-regular.ttf", 20*sizeFactor)

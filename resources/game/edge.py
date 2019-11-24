@@ -2,6 +2,7 @@ class Edge(object):
     def __init__(self, id):
         self.road = None
         self.id = id
+        self.pos = None
     
     def __repr__(self):
         return f'<Edge at id [{self.id}]>'

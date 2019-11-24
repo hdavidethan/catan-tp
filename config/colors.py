@@ -11,6 +11,7 @@ class Colors(object):
     GOLD_1 = pygame.Color('0xfbbd08')
     GOLD_2 = pygame.Color('0xeaae00')
     GOLD_3 = pygame.Color('0xcd9903')
+    GOLD_DISABLED = pygame.Color('0xfbbd0873')
 
     # Tile Colors
     FOREST = pygame.Color('0x415c32')
@@ -26,3 +27,5 @@ class Colors(object):
     PLAYER[1] = (pygame.Color('0x92140c'), WHITE)
     PLAYER[2] = (pygame.Color('0x002642'), WHITE)
     PLAYER[3] = (pygame.Color('0x8cb369'), BLACK)
+
+    BUTTON_COLORS = [GOLD_1, GOLD_2, BLACK, GOLD_DISABLED, WHITE]

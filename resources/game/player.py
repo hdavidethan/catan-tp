@@ -6,6 +6,9 @@ class Player(object):
         self.victoryPoints = 0
         self.longestRoad = 0
         self.largestArmy = 0
+        self.roads = set()
+        self.settlements = set()
+        self.cities = set()
         self.bgColor, self.textColor = Colors.PLAYER[index]
         self.resources = {'lumber':0, 'sheep':0, 'brick':0, 'ore': 0, 'grain': 0}
     
