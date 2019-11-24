@@ -1,4 +1,4 @@
-import pygame, copy
+import pygame, copy, random
 from pygame import gfxdraw
 from pygameFramework import PygameGame
 from resources.gui.button import Button
@@ -6,6 +6,7 @@ from resources.game.board import Board
 from resources.game.math import CatanMath
 from resources.game.player import Player
 from resources.gui.scorecard import Scorecard
+from resources.gui.dice import Dice
 from config.colors import Colors
 from config.config import windowConfig
 from config.text import Text
@@ -23,6 +24,10 @@ class CatanGame(PygameGame):
     def resetGame(self):
         self.board = Board()
         self.turn = 0
+        self.dice1 = Dice(self, windowConfig.DICE_1, windowConfig.DICE_SIZE, 0)
+        self.dice2 = Dice(self, windowConfig.DICE_2, windowConfig.DICE_SIZE, 1)
+        self.dice1.roll()
+        self.dice2.roll()
         self.currentPlayer = 0
 
     # Sets the active mode of the app
@@ -51,6 +56,11 @@ class CatanGame(PygameGame):
         for player in self.board.players:
             self.elements.add(Scorecard(player, scores[scoreCounter], windowConfig.SCORE_SIZE))
             scoreCounter += 1
+        endTurnColors = [Colors.GOLD_1, Colors.GOLD_2]
+        endTurnButton = Button(windowConfig.END_TURN,windowConfig.END_TURN_SIZE, 'End Turn', endTurnColors, ('endTurn', None), 0.4)
+        self.elements.add(endTurnButton)
+        self.elements.add(self.dice1)
+        self.elements.add(self.dice2)
 
     # Handles keystrokes
     def keyPressed(self, key, mod):
@@ -58,11 +68,17 @@ class CatanGame(PygameGame):
             if (key == pygame.K_m):
                 self.activeMode = 'menu'
             elif (key == pygame.K_r):
-                self.board = Board()
+                self.resetGame()
+            elif (key == pygame.K_c):
+                for player in self.board.players:
+                    player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
     
+    # Handles end turn clicks
     def endTurn(self):
         self.turn += 1
         self.currentPlayer = self.turn % 4
+        self.dice1.roll()
+        self.dice2.roll()
     
     # Handles mouse presses
     def mousePressed(self, mx, my):
@@ -101,6 +117,29 @@ class CatanGame(PygameGame):
     def drawGUI(self, screen):
         for element in self.elements:
             element.draw(screen)
+        self.drawCurrentPlayer(screen)
+        self.drawResources(screen)
+    
+    # Draws the resource panel at the bottom of the screen
+    def drawResources(self, screen):
+        x, y = windowConfig.RESOURCES
+        width, height = windowConfig.RESOURCES_SIZE
+        pygame.draw.rect(screen, Colors.BLACK, (x, y, width, height), 1)
+        resources = self.board.players[self.currentPlayer].resources
+        resourceText = f"{resources['lumber']} Lumber, {resources['brick']} Brick, {resources['sheep']} Sheep, {resources['grain']} Grain, {resources['ore']} Ore"
+        resourceLabel = Text.RESOURCE_FONT.render(resourceText, True, Colors.BLACK)
+        resourceSurf = resourceLabel.get_rect()
+        resourceSurf.center = pygame.Rect(x, y, width, height).center
+        screen.blit(resourceLabel, resourceSurf)
+
+    # Draws the current player's on the screen
+    def drawCurrentPlayer(self, screen):
+        currentPlayer = self.currentPlayer + 1
+        currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer}\'s Turn', True, Colors.BLACK)
+        currentPlayerSurf = currentPlayerText.get_rect()
+        currentPlayerSurf.left = windowConfig.CURRENT_PLAYER[0]
+        currentPlayerSurf.centery = windowConfig.CURRENT_PLAYER[1]
+        screen.blit(currentPlayerText, currentPlayerSurf)
 
     # Draws the Catan Board
     def drawBoard(self, screen):
@@ -172,7 +211,11 @@ class CatanGame(PygameGame):
         tokenSize = int(0.17 * hexHeight)
         number = self.board.hexBoard[i][j].number
         if (number != None):
-            pygame.draw.circle(screen, Colors.WHITE, center, tokenSize)
+            active = self.dice1.value + self.dice2.value
+            color = Colors.WHITE
+            if (number == active):
+                color = Colors.GOLD_1
+            pygame.draw.circle(screen, color, center, tokenSize)
             gfxdraw.aacircle(screen, center[0], center[1], tokenSize, Colors.BLACK)
             if (number in [6, 8]):
                 tokenColor = Colors.BLACK

@@ -4,6 +4,8 @@ class Colors(object):
     # Basic Colors
     WHITE = pygame.Color('0xffffff')
     BLACK = pygame.Color('0x000000')
+    RED_1 = pygame.Color('0xe24e1b')
+    RED_2 = pygame.Color('0xda7635')
 
     # Menu Colors
     GOLD_1 = pygame.Color('0xfbbd08')
@@ -19,7 +21,8 @@ class Colors(object):
     DESERT = pygame.Color('0xf2ee76')
 
     # Player Colors
-    PLAYER_1 = pygame.Color('0xd0f2e3')
-    PLAYER_2 = pygame.Color('0x92140c')
-    PLAYER_3 = pygame.Color('0x002642')
-    PLAYER_4 = pygame.Color('0x8cb369')
+    PLAYER = dict()
+    PLAYER[0] = (pygame.Color('0xd0f2e3'), BLACK)
+    PLAYER[1] = (pygame.Color('0x92140c'), WHITE)
+    PLAYER[2] = (pygame.Color('0x002642'), WHITE)
+    PLAYER[3] = (pygame.Color('0x8cb369'), BLACK)

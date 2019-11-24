@@ -14,3 +14,6 @@ class Element(object):
         y0 = cy - height / 2
         rectArgs = (x0, y0, width, height)
         return rectArgs
+    
+    def onClick(self, game):
+        pass

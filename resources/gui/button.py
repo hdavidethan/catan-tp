@@ -34,6 +34,8 @@ class Button(Element):
         if (isinstance(self.binding, tuple)):
             if (self.binding[0] == 'changeMode'):
                 game.setActiveMode(self.binding[1])
+            elif (self.binding[0] == 'endTurn'):
+                game.endTurn()
             elif (self.binding[0] == 'quit'):
                 game._running = False
     
