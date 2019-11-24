@@ -52,10 +52,13 @@ class Button(Element):
                     if (isinstance(buildObject, Node)):
                         buildObject.nodeLevel += 1
                         if (buildObject.nodeLevel == 1):
-                            player.resources['lumber'] -= 1
-                            player.resources['sheep'] -= 1
-                            player.resources['brick'] -= 1
-                            player.resources['grain'] -= 1
+                            if (not game.setupMode):
+                                player.resources['lumber'] -= 1
+                                player.resources['sheep'] -= 1
+                                player.resources['brick'] -= 1
+                                player.resources['grain'] -= 1
+                            elif (game.turn // 4 == 0):
+                                buildObject.setupCollect(player, game.board)
                             player.settlements.add(buildObject.id)
                             buildObject.checkAdjacencies(game.board)
                         elif (buildObject.nodeLevel == 2):
@@ -65,8 +68,9 @@ class Button(Element):
                             player.cities.add(buildObject.id)
                         buildObject.owner = player
                     elif (isinstance(buildObject, Edge)):
-                        player.resources['lumber'] -= 1
-                        player.resources['brick'] -= 1
+                        if (not game.setupMode):
+                            player.resources['lumber'] -= 1
+                            player.resources['brick'] -= 1
                         player.roads.add(buildObject.id)
                         buildObject.road = player.bgColor
                     game.inBuildMode = False

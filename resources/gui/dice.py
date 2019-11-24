@@ -11,7 +11,7 @@ class Dice(Element):
         self.pos = pos
         self.size = size
         self.index = index
-        self.value = random.randint(1,6)
+        self.value = 0
     
     def roll(self):
         self.value = random.randint(1,6)
@@ -30,30 +30,31 @@ class Dice(Element):
         screen.blit(label, labelPos)
     
     def getDiceSurface(self, surface, n, rectArgs):
-        x, y, width, height = rectArgs
-        dice = {1:[[False]*3, [False, True, False], [False]*3],
-                2:[[True, False, False], [False]*3, [False, False, True]],
-                3:[[True, False, False], [False, True, False], [False, False, True]],
-                4:[[True, False, True], [False]*3, [True, False, True]],
-                5:[[True, False, True], [False, True, False], [True, False, True]],
-                6:[[True, False, True]]*3}
-        diceList = dice[n]
-        spacing = width / 7
-        for i in range(3):
-            for j in range(3):
-                x = 2 * i + 1
-                y = 2 * j + 1
-                x0 = int(x * spacing)
-                y0 = int(y * spacing)
-                x1 = int(x0 + spacing)
-                y1 = int(y0 + spacing)
-                r = spacing / 2
-                cx, cy = x0 + r, y0 + r
-                cx, cy = int(cx), int(cy)
-                r = int(r * 1.5)
-                if (diceList[i][j]):
-                    gfxdraw.aacircle(surface, cx, cy, r, Colors.WHITE)
-                    gfxdraw.filled_circle(surface, cx, cy, r, Colors.WHITE)
+        if (n > 0):
+            x, y, width, height = rectArgs
+            dice = {1:[[False]*3, [False, True, False], [False]*3],
+                    2:[[True, False, False], [False]*3, [False, False, True]],
+                    3:[[True, False, False], [False, True, False], [False, False, True]],
+                    4:[[True, False, True], [False]*3, [True, False, True]],
+                    5:[[True, False, True], [False, True, False], [True, False, True]],
+                    6:[[True, False, True]]*3}
+            diceList = dice[n]
+            spacing = width / 7
+            for i in range(3):
+                for j in range(3):
+                    x = 2 * i + 1
+                    y = 2 * j + 1
+                    x0 = int(x * spacing)
+                    y0 = int(y * spacing)
+                    x1 = int(x0 + spacing)
+                    y1 = int(y0 + spacing)
+                    r = spacing / 2
+                    cx, cy = x0 + r, y0 + r
+                    cx, cy = int(cx), int(cy)
+                    r = int(r * 1.5)
+                    if (diceList[i][j]):
+                        gfxdraw.aacircle(surface, cx, cy, r, Colors.WHITE)
+                        gfxdraw.filled_circle(surface, cx, cy, r, Colors.WHITE)
                     
 
 

@@ -1,4 +1,6 @@
 import math
+from config.colors import Colors
+
 class CatanMath(object):
     # Draws an equilateral triangle from a hexagon outside the hexagon
     @staticmethod
@@ -53,4 +55,22 @@ class CatanMath(object):
         x2, y2 = point2
         return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
+class Utils(object):
+
+    @staticmethod
+    def getResourceFromType(type):
+        resources = {'forest':'lumber', 'desert':None,
+                    'hills':'brick', 'mountains':'ore',
+                    'pasture':'sheep', 'fields':'grain',
+                    None:None}
+        return resources[type]
+    
+    # @staticmethod
+    # def getPlayerFromColor(players, color):
+    #     player = None
+    #     for key in Colors.PLAYER:
+    #         if (Colors.PLAYER[key][0] == color):
+    #             player = key
+    #         print(player, Colors.PLAYER[key][0], color)
+    #     return players[player] if player is not None else None
         

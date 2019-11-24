@@ -3,7 +3,8 @@ from pygame import gfxdraw
 from pygameFramework import PygameGame
 from resources.gui.button import Button
 from resources.game.board import Board
-from resources.game.math import CatanMath
+from resources.game.utils import CatanMath
+from resources.game.utils import Utils
 from resources.game.player import Player
 from resources.gui.scorecard import Scorecard
 from resources.gui.dice import Dice
@@ -32,8 +33,6 @@ class CatanGame(PygameGame):
         self.turn = 0
         self.dice1 = Dice(self, windowConfig.DICE_1, windowConfig.DICE_SIZE, 0)
         self.dice2 = Dice(self, windowConfig.DICE_2, windowConfig.DICE_SIZE, 1)
-        self.dice1.roll()
-        self.dice2.roll()
         self.currentPlayer = 0
 
     # Sets the active mode of the app
@@ -81,7 +80,23 @@ class CatanGame(PygameGame):
         self.buildElements['city'] = buildCityButton
         self.buildElements['devCard'] = buildDevCardButton
         self.initRoadsWrapper()
-        self.startTurn()
+        self.setupMode = True
+        players1 = [i for i in range(4, 8)]
+        players2 = [i for i in range(4)]
+        self.setupPlayOrder = players2 + players1[::-1]
+        self.startSetupTurn()
+    
+    def startSetupTurn(self):
+        if (len(self.setupPlayOrder) > 0):
+            self.turn = self.setupPlayOrder.pop()
+            self.currentPlayer = self.turn % 4
+            player = self.board.players[self.turn % 4]
+            self.checkBuildConditions(player)
+        else:
+            self.setupMode = False
+            self.dice1.roll()
+            self.dice2.roll()
+            self.startTurn()
     
     def initRoadsWrapper(self):
         for i in range(self.board.q):
@@ -130,18 +145,48 @@ class CatanGame(PygameGame):
                     player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
     
     def startTurn(self):
+        self.collectResources()
         turn = self.currentPlayer
         player = self.board.players[turn]
         self.checkBuildConditions(player)
 
+    # Handles end turn clicks
+    def endTurn(self):
+        if (not self.setupMode):
+            self.turn += 1
+            self.currentPlayer = self.turn % 4
+            self.dice1.roll()
+            self.dice2.roll()
+            self.startTurn()
+        else:
+            self.startSetupTurn()
+    
+    def collectResources(self):
+        for i in range(self.board.q):
+            row = copy.copy(self.board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = self.board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = self.board.hexBoard[i][j+firstIndex]
+                if (tile.number == (self.dice1.value + self.dice2.value)):
+                    for node in tile.nodes:
+                        if (node.owner != None):
+                            node.collectFromNumber(node.owner, tile.number, self.board)
+
     def checkBuildConditions(self, player):
-        roadCondition = (player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
+        roadCondition = ((not self.setupMode and player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
                             and (len(player.settlements) + len(player.cities)) > 0)
-        settlementCondition = (player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
+                            or (self.setupMode and (len(player.roads) < len(player.settlements))))
+        settlementCondition = ((player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
                             and player.resources['grain'] >= 1 and player.resources['sheep'] >= 1)
+                            or (self.setupMode and ((self.turn // 4 == 1 and len(player.settlements) == 0) or
+                            (self.turn // 4 == 0 and len(player.settlements) == 1))))
         cityCondition = (player.resources['ore'] >= 3 and player.resources['grain'] >= 2
                             and len(player.settlements) > 0)
-        devCardCondition = (player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
+        devCardCondition = (not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
                             and player.resources['grain'] >= 1)
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))
@@ -191,14 +236,6 @@ class CatanGame(PygameGame):
                             None, Colors.BUTTON_COLORS, ('buildConfirm', (edge, self.board.players[self.currentPlayer])), 0.4)
                         self.selectElements.add(roadButton)
 
-    # Handles end turn clicks
-    def endTurn(self):
-        self.turn += 1
-        self.currentPlayer = self.turn % 4
-        self.dice1.roll()
-        self.dice2.roll()
-        self.startTurn()
-    
     def checkVictoryPoints(self):
         player = self.board.players[self.currentPlayer]
         settlements = len(player.settlements)

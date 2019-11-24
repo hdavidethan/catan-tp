@@ -112,3 +112,17 @@ class Board(object):
         for r, q in order:
             if (self.hexBoard[r][q].type != 'desert'):
                 self.hexBoard[r][q].number = number.pop()
+    
+    def startingSettlement(self):
+        for i in range(q):
+            row = copy.copy(hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = hexBoard[i][j+firstIndex]
+                for node in tile.nodes:
+                    node.buildable = False
+        return seen
