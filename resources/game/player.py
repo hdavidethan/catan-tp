@@ -11,6 +11,8 @@ class Player(object):
         self.cities = set()
         self.bgColor, self.textColor = Colors.PLAYER[index]
         self.resources = {'lumber':0, 'sheep':0, 'brick':0, 'ore': 0, 'grain': 0}
+        self.discardGoal = None
     
+    # Counts the total number of cards of the player
     def countCards(self):
         return sum(self.resources.values())

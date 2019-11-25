@@ -44,7 +44,10 @@ class Button(Element):
                 if (self.binding[0] == 'changeMode'):
                     game.setActiveMode(self.binding[1])
                 elif (self.binding[0] == 'endTurn'):
-                    game.endTurn()
+                    if (not game.discardMode):
+                        game.endTurn()
+                    else:
+                        game.endDiscard()
                 elif (self.binding[0] == 'build'):
                     game.buildMode(self.binding[1])
                 elif (self.binding[0] == 'buildConfirm'):
@@ -76,6 +79,10 @@ class Button(Element):
                     game.inBuildMode = False
                     game.checkBuildConditions(player)
                     game.checkVictoryPoints()
+                elif (self.binding[0] == 'discard'):
+                    print(1)
+                    player = game.board.players[game.currentPlayer]
+                    game.discardResource(player, self.binding[1])
                 elif (self.binding[0] == 'quit'):
                     game._running = False
     

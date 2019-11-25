@@ -19,7 +19,7 @@ class windowConfig(object):
     SCORE_SIZE = (0.2 * WIDTH, 0.2 * HEIGHT)
 
     # GUI
-    CURRENT_PLAYER = (0.82 * WIDTH, 0.705 * HEIGHT)
+    CURRENT_PLAYER = (0.98 * WIDTH, 0.705 * HEIGHT)
     END_TURN = (0.9 * WIDTH, 0.76 * HEIGHT)
     END_TURN_SIZE = (0.18 * WIDTH, 0.05 * HEIGHT)
     
@@ -40,3 +40,11 @@ class windowConfig(object):
     BUILD_DEVCARD_SIZE = (0.18 * WIDTH, 0.05 * HEIGHT)
 
     BUILD_BUTTON_SIZE = (0.025 * sizeFactor, 0.025 * sizeFactor)
+
+    DISCARD_LUMBER = (0.32 * WIDTH, 0.85 * HEIGHT)
+    DISCARD_BRICK = (0.37 * WIDTH, 0.85 * HEIGHT)
+    DISCARD_SHEEP = (0.42 * WIDTH, 0.85 * HEIGHT)
+    DISCARD_GRAIN = (0.47 * WIDTH, 0.85 * HEIGHT)
+    DISCARD_ORE = (0.52 * WIDTH, 0.85 * HEIGHT)
+
+    DISCARD_SIZE = (0.04 * sizeFactor, 0.04 * sizeFactor)

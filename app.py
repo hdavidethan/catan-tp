@@ -29,6 +29,9 @@ class CatanGame(PygameGame):
     # Resets all game variables (Board, Player, etc.)
     def resetGame(self):
         self.inBuildMode = False
+        self.discardMode = False
+        self.toDiscard = []
+        self.auxPlayer = None
         self.board = Board()
         self.turn = 0
         self.dice1 = Dice(self, windowConfig.DICE_1, windowConfig.DICE_SIZE, 0)
@@ -79,13 +82,25 @@ class CatanGame(PygameGame):
         self.buildElements['settlement'] = buildSettleButton
         self.buildElements['city'] = buildCityButton
         self.buildElements['devCard'] = buildDevCardButton
+        self.discardElements = dict()
+        discardLumber = Button(windowConfig.DISCARD_LUMBER, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'lumber'), 0.4, font=Text.DISCARD_FONT)
+        discardBrick = Button(windowConfig.DISCARD_BRICK, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'brick'), 0.4, font=Text.DISCARD_FONT)
+        discardSheep = Button(windowConfig.DISCARD_SHEEP, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'sheep'), 0.4, font=Text.DISCARD_FONT)
+        discardGrain = Button(windowConfig.DISCARD_GRAIN, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'grain'), 0.4, font=Text.DISCARD_FONT)
+        discardOre = Button(windowConfig.DISCARD_ORE, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'ore'), 0.4, font=Text.DISCARD_FONT)
+        self.discardElements['lumber'] = discardLumber
+        self.discardElements['brick'] = discardBrick
+        self.discardElements['sheep'] = discardSheep
+        self.discardElements['grain'] = discardGrain
+        self.discardElements['ore'] = discardOre
         self.initRoadsWrapper()
         self.setupMode = True
         players1 = [i for i in range(4, 8)]
         players2 = [i for i in range(4)]
         self.setupPlayOrder = players2 + players1[::-1]
         self.startSetupTurn()
-    
+
+    # Starts the turn during the Set-up Phase
     def startSetupTurn(self):
         if (len(self.setupPlayOrder) > 0):
             self.turn = self.setupPlayOrder.pop()
@@ -98,6 +113,7 @@ class CatanGame(PygameGame):
             self.dice2.roll()
             self.startTurn()
     
+    # Wrapper to initialize road positions
     def initRoadsWrapper(self):
         for i in range(self.board.q):
             row = copy.copy(self.board.hexBoard[i])
@@ -116,7 +132,8 @@ class CatanGame(PygameGame):
                 y1 = y0 + self.hexHeight
                 hexPoints = CatanMath.getHexagonPoints((x0, y0, x1, y1))
                 self.initRoads(tile, (x0, y0, x1, y1))
-                
+
+    # Initializes road positions         
     def initRoads(self, tile, tileBounds):
         x0, y0, x1, y1 = tileBounds
         edgeIndex = 0
@@ -144,8 +161,15 @@ class CatanGame(PygameGame):
                 for player in self.board.players:
                     player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
     
+    # Starts the turn
     def startTurn(self):
-        self.collectResources()
+        self.dice1.roll()
+        self.dice2.roll()
+        roll = self.dice1.value + self.dice2.value
+        if (roll == 7):
+            self.sevenHandler()
+        else:
+            self.collectResources()
         turn = self.currentPlayer
         player = self.board.players[turn]
         self.checkBuildConditions(player)
@@ -155,12 +179,11 @@ class CatanGame(PygameGame):
         if (not self.setupMode):
             self.turn += 1
             self.currentPlayer = self.turn % 4
-            self.dice1.roll()
-            self.dice2.roll()
             self.startTurn()
         else:
             self.startSetupTurn()
     
+    # Collects resources for all players given current roll
     def collectResources(self):
         for i in range(self.board.q):
             row = copy.copy(self.board.hexBoard[i])
@@ -171,28 +194,79 @@ class CatanGame(PygameGame):
             rowLen = len(row)
             for j in range(rowLen): 
                 tile = self.board.hexBoard[i][j+firstIndex]
-                if (tile.number == (self.dice1.value + self.dice2.value)):
+                if (tile.number == (self.dice1.value + self.dice2.value) and not tile.hasRobber):
                     for node in tile.nodes:
                         if (node.owner != None):
                             node.collectFromNumber(node.owner, tile.number, self.board)
 
+    def sevenHandler(self):
+        self.toDiscard = []
+        for player in self.board.players:
+            if (player.countCards() > 7):
+                self.toDiscard.append(player.index)
+        self.auxPlayer = self.currentPlayer
+        self.startDiscard()
+    
+    def startDiscard(self):
+        self.discardMode = True
+        self.currentPlayer = self.toDiscard.pop(0)
+        player = self.board.players[self.currentPlayer]
+        player.discardGoal = player.countCards() // 2
+        self.checkDiscardConditions(player)
+        self.checkEndTurnConditions(player)
+    
+    def endDiscard(self):
+        if (len(self.toDiscard) == 0):
+            self.discardMode = False
+            self.currentPlayer = self.auxPlayer
+        else:
+            self.startDiscard()
+
+    def discardResource(self, player, resource):
+        print(2)
+        player.resources[resource] -= 1
+        self.checkDiscardConditions(player)
+        self.checkEndTurnConditions(player)
+
+    def checkDiscardConditions(self, player):
+        for resource in player.resources:
+            count = player.resources[resource]
+            if (count < 1):
+                self.discardElements[resource].isDisabled = True
+            else:
+                self.discardElements[resource].isDisabled = False
+
+    def checkEndTurnConditions(self, player):
+        if (self.discardMode and self.board.players[self.currentPlayer].countCards() > player.discardGoal):
+            tmpButton = Button(windowConfig.END_TURN, None, None, None, None)
+            for element in self.elements:
+                if (element == tmpButton):
+                    element.isDisabled = True
+        else:
+            tmpButton = Button(windowConfig.END_TURN, None, None, None, None)
+            for element in self.elements:
+                if (element == tmpButton):
+                    element.isDisabled = False
+
+    # Checks build conditions and enables/disables the corresponding buttons
     def checkBuildConditions(self, player):
-        roadCondition = ((not self.setupMode and player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
-                            and (len(player.settlements) + len(player.cities)) > 0)
+        roadCondition = (((not self.setupMode and player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
+                            and (len(player.settlements) + len(player.cities)) > 0) and not self.discardMode)
                             or (self.setupMode and (len(player.roads) < len(player.settlements))))
-        settlementCondition = ((player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
+        settlementCondition = (((player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
                             and player.resources['grain'] >= 1 and player.resources['sheep'] >= 1)
                             or (self.setupMode and ((self.turn // 4 == 1 and len(player.settlements) == 0) or
-                            (self.turn // 4 == 0 and len(player.settlements) == 1))))
-        cityCondition = (player.resources['ore'] >= 3 and player.resources['grain'] >= 2
-                            and len(player.settlements) > 0)
-        devCardCondition = (not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
-                            and player.resources['grain'] >= 1)
+                            (self.turn // 4 == 0 and len(player.settlements) == 1)))) and not self.discardMode)
+        cityCondition = ((player.resources['ore'] >= 3 and player.resources['grain'] >= 2
+                            and len(player.settlements) > 0) and not self.discardMode)
+        devCardCondition = ((not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
+                            and player.resources['grain'] >= 1) and not self.discardMode)
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))
         for build in conditions:
             self.buildElements[build[0]].isDisabled = not build[1]
     
+    # Handles the Build Mode logic
     def buildMode(self, build):
         self.inBuildMode = True
         self.selectElements = set()
@@ -236,6 +310,7 @@ class CatanGame(PygameGame):
                             None, Colors.BUTTON_COLORS, ('buildConfirm', (edge, self.board.players[self.currentPlayer])), 0.4)
                         self.selectElements.add(roadButton)
 
+    # Checks for total victory points of the current player.
     def checkVictoryPoints(self):
         player = self.board.players[self.currentPlayer]
         settlements = len(player.settlements)
@@ -264,6 +339,12 @@ class CatanGame(PygameGame):
                     y1 = y0 + height
                     if (mx > x0 and mx < x1 and my > y0 and my < y1):
                         selectElement.onClick(self)
+            for key in self.discardElements:
+                x0, y0, width, height = self.discardElements[key].getRectArgs()
+                x1 = x0 + width
+                y1 = y0 + height
+                if (mx > x0 and mx < x1 and my > y0 and my < y1):
+                    self.discardElements[key].onClick(self)
 
     # Redraws everything on the surface
     def redrawAll(self, screen):
@@ -298,6 +379,9 @@ class CatanGame(PygameGame):
         if (self.inBuildMode):
             for selectElement in self.selectElements:
                 selectElement.draw(screen)
+        if (self.discardMode):
+            for key in self.discardElements:
+                self.discardElements[key].draw(screen)
         self.drawCurrentPlayer(screen)
         self.drawResources(screen)
     
@@ -316,9 +400,14 @@ class CatanGame(PygameGame):
     # Draws the current player's on the screen
     def drawCurrentPlayer(self, screen):
         currentPlayer = self.currentPlayer + 1
-        currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer}\'s Turn', True, Colors.BLACK)
+        if (not self.discardMode):
+            currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer}\'s Turn', True, Colors.BLACK)
+        else:
+            player = self.board.players[self.currentPlayer]
+            remaining = player.countCards() - player.discardGoal
+            currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer} Must Discard {remaining} Cards!', True, Colors.RED_1)
         currentPlayerSurf = currentPlayerText.get_rect()
-        currentPlayerSurf.left = windowConfig.CURRENT_PLAYER[0]
+        currentPlayerSurf.right = windowConfig.CURRENT_PLAYER[0]
         currentPlayerSurf.centery = windowConfig.CURRENT_PLAYER[1]
         screen.blit(currentPlayerText, currentPlayerSurf)
 
@@ -388,10 +477,11 @@ class CatanGame(PygameGame):
         i, j = pos
         tokenSize = int(0.17 * hexHeight)
         number = self.board.hexBoard[i][j].number
+        hasRobber = self.board.hexBoard[i][j].hasRobber
         if (number != None):
             active = self.dice1.value + self.dice2.value
             color = Colors.WHITE
-            if (number == active):
+            if (number == active and not hasRobber):
                 color = Colors.GOLD_1
             pygame.draw.circle(screen, color, center, tokenSize)
             gfxdraw.aacircle(screen, center[0], center[1], tokenSize, Colors.BLACK)
@@ -403,6 +493,12 @@ class CatanGame(PygameGame):
             tokenSurf = token.get_rect()
             tokenSurf.center = center
             screen.blit(token, tokenSurf)
+        if (hasRobber):
+            robberLabel = Text.ROBBER_FONT.render('R', True, Colors.RED_2)
+            robberPos = robberLabel.get_rect()
+            robberPos.centerx = center[0]
+            robberPos.centery = center[1] + 0.3 * hexHeight
+            screen.blit(robberLabel, robberPos)
     
     # Draws Ports on the Catan Board
     def drawPorts(self, screen, currentPos, hexPoints, center):

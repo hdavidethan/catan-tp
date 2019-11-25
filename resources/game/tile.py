@@ -5,6 +5,7 @@ class Tile(object):
         self.edges = []
         self.nodes = []
         self.type = None
+        self.hasRobber = False
 
     def __repr__(self):
         r = self.pos[0]
