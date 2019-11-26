@@ -52,35 +52,7 @@ class Button(Element):
                 elif (self.binding[0] == 'build'):
                     game.buildMode(self.binding[1])
                 elif (self.binding[0] == 'buildConfirm'):
-                    buildObject, player = self.binding[1]
-                    if (isinstance(buildObject, Node)):
-                        buildObject.nodeLevel += 1
-                        if (buildObject.nodeLevel == 1):
-                            if (not game.setupMode):
-                                player.resources['lumber'] -= 1
-                                player.resources['sheep'] -= 1
-                                player.resources['brick'] -= 1
-                                player.resources['grain'] -= 1
-                            elif (game.turn // 4 == 0):
-                                buildObject.setupCollect(player, game.board)
-                            player.settlements.add(buildObject.id)
-                            buildObject.checkAdjacencies(game.board)
-                        elif (buildObject.nodeLevel == 2):
-                            player.resources['ore'] -= 3
-                            player.resources['grain'] -= 2
-                            player.settlements.remove(buildObject.id)
-                            player.cities.add(buildObject.id)
-                        buildObject.owner = player
-                    elif (isinstance(buildObject, Edge)):
-                        if (not game.setupMode):
-                            player.resources['lumber'] -= 1
-                            player.resources['brick'] -= 1
-                        player.roads.add(buildObject.id)
-                        buildObject.road = player.bgColor
-                    game.inBuildMode = False
-                    game.checkBuildConditions(player)
-                    game.checkLongestRoad(player)
-                    game.checkVictoryPoints()
+                    Button.buildModeHandler(game, self.binding)
                 elif (self.binding[0] == 'discard'):
                     player = game.board.players[game.currentPlayer]
                     game.discardResource(player, self.binding[1])
@@ -113,3 +85,35 @@ class Button(Element):
             textSurf = text.get_rect()
             textSurf.center = self.pos
             screen.blit(text, textSurf)
+    
+    @staticmethod
+    def buildModeHandler(game, binding):
+        buildObject, player = binding[1]
+        if (isinstance(buildObject, Node)):
+            buildObject.nodeLevel += 1
+            if (buildObject.nodeLevel == 1):
+                if (not game.setupMode):
+                    player.resources['lumber'] -= 1
+                    player.resources['sheep'] -= 1
+                    player.resources['brick'] -= 1
+                    player.resources['grain'] -= 1
+                elif (game.turn // 4 == 0):
+                    buildObject.setupCollect(player, game.board)
+                player.settlements.add(buildObject.id)
+                buildObject.checkAdjacencies(game.board)
+            elif (buildObject.nodeLevel == 2):
+                player.resources['ore'] -= 3
+                player.resources['grain'] -= 2
+                player.settlements.remove(buildObject.id)
+                player.cities.add(buildObject.id)
+            buildObject.owner = player
+        elif (isinstance(buildObject, Edge)):
+            if (not game.setupMode):
+                player.resources['lumber'] -= 1
+                player.resources['brick'] -= 1
+            player.roads.add(buildObject.id)
+            buildObject.road = player.bgColor
+        game.inBuildMode = False
+        game.checkBuildConditions(player)
+        game.checkLongestRoad(player)
+        game.checkVictoryPoints()

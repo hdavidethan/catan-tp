@@ -78,6 +78,11 @@ class Utils(object):
             if (victim.resources[key] == 0):
                 validSteals.remove(key)
         return random.choice(validSteals)
+    
+    @staticmethod
+    def getProbabilityFromNumber(n):
+        probabilities = {2:1, 3:2, 4:3, 5:4, 6:5, 8:5, 9:4, 10:3, 11:2, 12:1}
+        return probabilities[n]
 
     # @staticmethod
     # def getPlayerFromColor(players, color):

@@ -12,6 +12,7 @@ from resources.game.board import Board
 from resources.game.utils import CatanMath
 from resources.game.utils import Utils
 from resources.game.player import Player
+from resources.game.aiplayer import AIPlayer
 from resources.gui.scorecard import Scorecard
 from resources.gui.dice import Dice
 from config.colors import Colors
@@ -28,34 +29,33 @@ class CatanGame(PygameGame):
         self.hexWidth = self.boardSize / 5
         self.hexHeight = self.boardSize / 4
         self.ySpacing = self.hexHeight * 3 / 4
-        self.resetGame()
         self.activeMode = None
         self.setActiveMode('menu')
     
     # Resets all game variables (Board, Player, etc.)
-    def resetGame(self):
+    def resetGame(self, AIGame):
         self.inBuildMode = False
         self.discardMode = False
         self.inRobberMode = False
         self.stealMode = False
         self.toDiscard = []
         self.auxPlayer = None
-        self.board = Board()
+        self.board = Board(AIGame=AIGame)
         self.turn = 0
         self.dice1 = Dice(self, windowConfig.DICE_1, windowConfig.DICE_SIZE, 0)
         self.dice2 = Dice(self, windowConfig.DICE_2, windowConfig.DICE_SIZE, 1)
         self.currentPlayer = 0
 
     # Sets the active mode of the app
-    def setActiveMode(self, mode):
+    def setActiveMode(self, mode, AIGame=False):
         if (mode == 'menu'):
             self.initMenu()
             self.activeMode = 'menu'
         elif (mode == 'setup'):
-            self.initSetup()
+            # self.initSetup()
             self.activeMode = 'setup'
         elif (mode == 'game'):
-            self.initGame()
+            self.initGame(AIGame)
             self.activeMode = 'game'
 
     # Runs upon Menu Mode activation/switch
@@ -67,7 +67,8 @@ class CatanGame(PygameGame):
         self.elements.add(menuButton2)
 
     # Runs upon Game Mode activation/switch
-    def initGame(self):
+    def initGame(self, AIGame):
+        self.resetGame(AIGame)
         self.oldRobberPos = None
         self.toDiscard = []
         self.elements = set()
@@ -123,7 +124,10 @@ class CatanGame(PygameGame):
             self.turn = self.setupPlayOrder.pop()
             self.currentPlayer = self.turn % 4
             player = self.board.players[self.turn % 4]
-            self.checkBuildConditions(player)
+            if (isinstance(player, AIPlayer)):
+                player.startTurn(self)
+            else:
+                self.checkBuildConditions(player)
         else:
             self.setupMode = False
             self.dice1.roll()
@@ -179,6 +183,9 @@ class CatanGame(PygameGame):
             elif (key == pygame.K_c):
                 for player in self.board.players:
                     player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
+        elif (self.activeMode == 'menu'):
+            if (key == pygame.K_a):
+                self.setActiveMode('game', AIGame=True)
     
     # Starts the turn
     def startTurn(self):
@@ -191,7 +198,10 @@ class CatanGame(PygameGame):
             self.collectResources()
         turn = self.currentPlayer
         player = self.board.players[turn]
-        self.checkBuildConditions(player)
+        if (isinstance(player, AIPlayer)):
+            player.startTurn(self)
+        else:
+            self.checkBuildConditions(player)
 
     # Handles end turn clicks
     def endTurn(self):
@@ -313,11 +323,12 @@ class CatanGame(PygameGame):
         cityCondition = ((player.resources['ore'] >= 3 and player.resources['grain'] >= 2
                             and len(player.settlements) > 0) and not self.discardMode)
         devCardCondition = ((not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
-                            and player.resources['grain'] >= 1) and not self.discardMode)
+                            and player.resources['grain'] >= 1) and not self.discardMode) and False # TODO: NOT YET DONE. WILL FIX THIS ONCE DEV CARDS ARE ADDED
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))
         for build in conditions:
             self.buildElements[build[0]].isDisabled = not build[1]
+        return conditions
     
     # Handles the Build Mode logic
     def buildMode(self, build):

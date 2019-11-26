@@ -70,6 +70,23 @@ class Node(object):
                     if (resource != None):
                         player.resources[resource] += self.nodeLevel
     
+    def getNodeValue(self, board):
+        resList = []
+        res = 0
+        for i in range(board.q):
+            row = copy.copy(board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = board.hexBoard[i][j+firstIndex]
+                if self in tile.nodes and tile.number != None:
+                    res += Utils.getProbabilityFromNumber(tile.number)
+                    resList.append((tile.number, Utils.getProbabilityFromNumber(tile.number)))
+        return res, resList
+    
     def collectFromNumber(self, player, n, board):
         for i in range(board.q):
             row = copy.copy(board.hexBoard[i])

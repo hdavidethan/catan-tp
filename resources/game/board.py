@@ -3,10 +3,11 @@ from resources.game.node import Node
 from resources.game.tile import Tile
 from resources.game.edge import Edge
 from resources.game.player import Player
+from resources.game.aiplayer import AIPlayer
 import copy, random
 
 class Board(object):
-    def __init__(self, r=5, q=5):
+    def __init__(self, r=5, q=5, AIGame=False):
         self.r = r
         self.q = q
         self.hexBoard = generateAxialList(self.r, self.q)
@@ -24,7 +25,10 @@ class Board(object):
         self.assignTypes()
         self.assignNumbers()
 
-        self.players = [Player(0), Player(1), Player(2), Player(3)]
+        if (AIGame == False):
+            self.players = [Player(0), Player(1), Player(2), Player(3)]
+        else:
+            self.players = [Player(0), AIPlayer(1), AIPlayer(2), AIPlayer(3)]
     
     # Generates the Edge objects into a list.
     def generateEdges(self):
