@@ -30,6 +30,7 @@ class CatanGame(PygameGame):
         self.hexHeight = self.boardSize / 4
         self.ySpacing = self.hexHeight * 3 / 4
         self.activeMode = None
+        self.isPaused = False
         self.setActiveMode('menu')
     
     # Resets all game variables (Board, Player, etc.)
@@ -60,6 +61,7 @@ class CatanGame(PygameGame):
 
     # Runs upon Menu Mode activation/switch
     def initMenu(self):
+        self.isPaused = False
         self.elements = set()
         menuButton1 = Button(windowConfig.MENU_B1,windowConfig.MENU_B1_SIZE, 'Start Game', Colors.BUTTON_COLORS, ('changeMode', 'game'), 0.4)
         menuButton2 = Button(windowConfig.MENU_B2, windowConfig.MENU_B2_SIZE, 'Quit Game', Colors.BUTTON_COLORS, ('quit', None), 0.4)
@@ -446,9 +448,12 @@ class CatanGame(PygameGame):
                 self.setActiveMode('menu')
             elif (key == pygame.K_r):
                 self.resetGame()
+            # HACK: CHEAT FOR DEBUG ONLY
             elif (key == pygame.K_c):
                 for player in self.board.players:
                     player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
+            elif (key == pygame.K_ESCAPE):
+                self.isPaused = not self.isPaused
         elif (self.activeMode == 'menu'):
             if (key == pygame.K_a):
                 self.setActiveMode('game', AIGame=True)
@@ -500,7 +505,18 @@ class CatanGame(PygameGame):
     def drawGame(self, screen):
         self.drawBoard(screen)
         self.drawGUI(screen)
+        if (self.isPaused):
+            self.drawPaused(screen)
     
+    def drawPaused(self, screen):
+        container = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        container.fill(Colors.BLACK_PAUSED)
+        pausedText = Text.PAUSED_FONT.render('Game Paused', True, Colors.WHITE)
+        pausedPos = pausedText.get_rect()
+        pausedPos.center = (self.width / 2, self.height / 2)
+        container.blit(pausedText, pausedPos)
+        screen.blit(container, (0, 0))
+
     # Draws the Menu Mode Components
     def drawMenu(self, screen):
         bgImage = pygame.image.load("resources/assets/images/bgCatan.jpg")
@@ -520,23 +536,23 @@ class CatanGame(PygameGame):
         container.fill(Colors.BLACK_ALPHA)
         screen.blit(container, (x, y))
         for element in self.elements:
-            element.draw(screen)
+            element.draw(screen, self)
     
     # Draws the GUI Components of the Game Mode
     def drawGUI(self, screen):
         for element in self.elements:
-            element.draw(screen)
+            element.draw(screen, self)
         for key in self.buildElements:
-            self.buildElements[key].draw(screen)
+            self.buildElements[key].draw(screen, self)
         if (self.inBuildMode or self.inRobberMode):
             for selectElement in self.selectElements:
-                selectElement.draw(screen)
+                selectElement.draw(screen, self)
         if (self.discardMode):
             for key in self.discardElements:
-                self.discardElements[key].draw(screen)
+                self.discardElements[key].draw(screen, self)
         if (self.stealMode):
             for key in self.stealElements:
-                self.stealElements[key].draw(screen)
+                self.stealElements[key].draw(screen, self)
         self.drawCurrentPlayer(screen)
         self.drawResources(screen)
     

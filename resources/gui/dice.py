@@ -16,7 +16,7 @@ class Dice(Element):
     def roll(self):
         self.value = random.randint(1,6)
     
-    def draw(self, screen):
+    def draw(self, screen, game):
         rectArgs = self.getRectArgs()
         x, y, width, height = rectArgs
         diceText = str(self.value)

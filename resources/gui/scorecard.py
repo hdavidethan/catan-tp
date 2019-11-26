@@ -15,7 +15,7 @@ class Scorecard(Element):
     def __hash__(self):
         return hash((self.player, self.pos, self.size))
     
-    def draw(self, screen):
+    def draw(self, screen, game):
         x, y = self.pos
         width, height = self.size
         pygame.draw.rect(screen, self.player.bgColor, (x, y, width, height))

@@ -5,6 +5,7 @@ class Colors(object):
     WHITE = pygame.Color('0xffffff')
     BLACK = pygame.Color('0x000000')
     BLACK_ALPHA = pygame.Color('0x0000007b')
+    BLACK_PAUSED = pygame.Color('0x000000ab')
     RED_1 = pygame.Color('0xe24e1b')
     RED_2 = pygame.Color('0xda7635')
     BLUE = pygame.Color('0x0097d3')

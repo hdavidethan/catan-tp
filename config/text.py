@@ -16,6 +16,7 @@ class Text(object):
     ROBBER_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 20*sizeFactor)
     DISCARD_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 18*sizeFactor)
     STEAL_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 18*sizeFactor)
+    PAUSED_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 36*sizeFactor)
 
     # Text Constants
     BUILD = dict()

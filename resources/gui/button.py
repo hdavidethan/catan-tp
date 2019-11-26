@@ -25,7 +25,7 @@ class Button(Element):
     def __hash__(self):
         return hash((self.pos, self.size, self.text))
 
-    def getColor(self, rectArgs):
+    def getColor(self, rectArgs, game):
         mx, my = pygame.mouse.get_pos()
         x0, y0, width, height = rectArgs
         x1, y1 = x0 + width, y0 + height
@@ -33,7 +33,7 @@ class Button(Element):
         if (self.isDisabled):
             return (buttonDisabled, textDisabled)
         else:
-            if (mx > x0 and mx < x1 and my > y0 and my < y1):
+            if (mx > x0 and mx < x1 and my > y0 and my < y1 and not game.isPaused):
                 return (secondary, text)
             else:
                 return (primary, text)
@@ -76,9 +76,9 @@ class Button(Element):
                 elif (self.binding[0] == 'quit'):
                     game._running = False
     
-    def draw(self, screen):
+    def draw(self, screen, game):
         rectArgs = self.getRectArgs()
-        bgColor, textColor = self.getColor(rectArgs)
+        bgColor, textColor = self.getColor(rectArgs, game)
         if (self.radius == 0):
             pygame.draw.rect(screen, bgColor, rectArgs)
         else:
