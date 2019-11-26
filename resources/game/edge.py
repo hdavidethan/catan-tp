@@ -12,3 +12,41 @@ class Edge(object):
 
     def __hash__(self):
         return hash(self.id)
+    
+    def checkAdjacent(self, other, board):
+        for i in range(board.q):
+            row = copy.copy(board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = board.hexBoard[i][j+firstIndex]
+                if (self in tile.edges and other in tile.edges):
+                    selfIndex = tile.edges.index(self)
+                    otherIndex = tile.edges.index(other)
+                    if (abs(selfIndex - otherIndex) == 1):
+                        return True
+        return False
+    
+    def getRoads(self, board):
+        for i in range(board.q):
+            row = copy.copy(board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = board.hexBoard[i][j+firstIndex]
+                if (self in tile.edges):
+                    index1 = tile.edges.index(self)
+                    index2 = check1 + 1
+                    node1 = tile.nodes[index1]
+                    node2 = tile.nodes[index2]
+                    roads1 = node1.getRoads(board)
+                    roads1.remove(self)
+                    roads2 = node2.getRoads(board)
+                    roads2.remove(self)
+                    return roads1, roads2

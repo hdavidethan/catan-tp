@@ -43,7 +43,7 @@ class Node(object):
                 row.remove(None)
             firstIndex = board.hexBoard[i].index(row[0])
             rowLen = len(row)
-            for j in range(rowLen): 
+            for j in range(rowLen):
                 tile = board.hexBoard[i][j+firstIndex]
                 if self in tile.nodes:
                     nodeIndex = tile.nodes.index(self)
@@ -84,4 +84,13 @@ class Node(object):
                     resource = Utils.getResourceFromType(tile.type)
                     if (tile.number == n):
                         player.resources[resource] += self.nodeLevel
+    
+    def checkOwnedRoads(self, board, player):
+        indexes = self.getRoads(board)
+        roads = set()
+        for index in indexes:
+            roads.add(board.edges[index])
+        for edge in roads:
+            if (edge.road == player.bgColor):
+                return True
 

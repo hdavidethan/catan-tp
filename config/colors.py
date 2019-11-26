@@ -4,20 +4,22 @@ class Colors(object):
     # Basic Colors
     WHITE = pygame.Color('0xffffff')
     BLACK = pygame.Color('0x000000')
+    BLACK_ALPHA = pygame.Color('0x0000007b')
     RED_1 = pygame.Color('0xe24e1b')
     RED_2 = pygame.Color('0xda7635')
+    BLUE = pygame.Color('0x0097d3')
 
     # Menu Colors
     GOLD_1 = pygame.Color('0xfbbd08')
     GOLD_2 = pygame.Color('0xeaae00')
     GOLD_3 = pygame.Color('0xcd9903')
-    GOLD_DISABLED = pygame.Color('0xfbbd0873')
+    GOLD_DISABLED = pygame.Color('0xf9dd86')
 
     # Tile Colors
     FOREST = pygame.Color('0x415c32')
     FIELDS = pygame.Color('0xc2ab4a')
     MOUNTAINS = pygame.Color('0x4d6066')
-    HILLS = pygame.Color('0x9c1428')
+    HILLS = pygame.Color('0xaa4756')
     PASTURE = pygame.Color('0x94fa52')
     DESERT = pygame.Color('0xf2ee76')
 

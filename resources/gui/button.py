@@ -2,6 +2,7 @@ from resources.gui.element import Element
 from resources.gui.roundedRect import drawRoundedRect
 from resources.game.node import Node
 from resources.game.edge import Edge
+from resources.game.utils import Utils
 from config.colors import Colors
 from config.text import Text
 import pygame
@@ -78,11 +79,25 @@ class Button(Element):
                         buildObject.road = player.bgColor
                     game.inBuildMode = False
                     game.checkBuildConditions(player)
+                    game.checkLongestRoad(player)
                     game.checkVictoryPoints()
                 elif (self.binding[0] == 'discard'):
-                    print(1)
                     player = game.board.players[game.currentPlayer]
                     game.discardResource(player, self.binding[1])
+                elif (self.binding[0] == 'placeRobber'):
+                    tile = self.binding[1][0]
+                    oldR, oldQ = game.oldRobberPos
+                    game.board.hexBoard[oldR][oldQ].hasRobber = False
+                    tile.hasRobber = True
+                    game.stealChoice(self.binding[1])
+                elif (self.binding[0] == 'stealConfirm'):
+                    currentPlayer = game.board.players[game.currentPlayer]
+                    victim = self.binding[1]
+                    resource = Utils.stealRandomResource(victim)
+                    victim.resources[resource] -= 1
+                    currentPlayer.resources[resource] += 1
+                    game.stealMode = False
+                    game.checkEndTurnConditions(currentPlayer)
                 elif (self.binding[0] == 'quit'):
                     game._running = False
     

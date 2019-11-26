@@ -1,4 +1,10 @@
-import math
+#########################################################################
+# Config File
+# Contains utility functions, i.e. Math
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
+import math, random
 from config.colors import Colors
 
 class CatanMath(object):
@@ -65,6 +71,14 @@ class Utils(object):
                     None:None}
         return resources[type]
     
+    @staticmethod
+    def stealRandomResource(victim):
+        validSteals = ['lumber', 'brick', 'ore', 'sheep', 'grain']
+        for key in victim.resources:
+            if (victim.resources[key] == 0):
+                validSteals.remove(key)
+        return random.choice(validSteals)
+
     # @staticmethod
     # def getPlayerFromColor(players, color):
     #     player = None

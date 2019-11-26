@@ -1,3 +1,9 @@
+#########################################################################
+# App File
+# Contains the main functions for the Catan Game
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import pygame, copy, random
 from pygame import gfxdraw
 from pygameFramework import PygameGame
@@ -30,6 +36,8 @@ class CatanGame(PygameGame):
     def resetGame(self):
         self.inBuildMode = False
         self.discardMode = False
+        self.inRobberMode = False
+        self.stealMode = False
         self.toDiscard = []
         self.auxPlayer = None
         self.board = Board()
@@ -43,6 +51,9 @@ class CatanGame(PygameGame):
         if (mode == 'menu'):
             self.initMenu()
             self.activeMode = 'menu'
+        elif (mode == 'setup'):
+            self.initSetup()
+            self.activeMode = 'setup'
         elif (mode == 'game'):
             self.initGame()
             self.activeMode = 'game'
@@ -54,9 +65,11 @@ class CatanGame(PygameGame):
         menuButton2 = Button(windowConfig.MENU_B2, windowConfig.MENU_B2_SIZE, 'Quit Game', Colors.BUTTON_COLORS, ('quit', None), 0.4)
         self.elements.add(menuButton1)
         self.elements.add(menuButton2)
-    
+
     # Runs upon Game Mode activation/switch
     def initGame(self):
+        self.oldRobberPos = None
+        self.toDiscard = []
         self.elements = set()
         self.selectElements = set()
         scores = [windowConfig.SCORE_1, windowConfig.SCORE_2, windowConfig.SCORE_3, windowConfig.SCORE_4]
@@ -83,22 +96,26 @@ class CatanGame(PygameGame):
         self.buildElements['city'] = buildCityButton
         self.buildElements['devCard'] = buildDevCardButton
         self.discardElements = dict()
-        discardLumber = Button(windowConfig.DISCARD_LUMBER, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'lumber'), 0.4, font=Text.DISCARD_FONT)
-        discardBrick = Button(windowConfig.DISCARD_BRICK, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'brick'), 0.4, font=Text.DISCARD_FONT)
-        discardSheep = Button(windowConfig.DISCARD_SHEEP, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'sheep'), 0.4, font=Text.DISCARD_FONT)
-        discardGrain = Button(windowConfig.DISCARD_GRAIN, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'grain'), 0.4, font=Text.DISCARD_FONT)
-        discardOre = Button(windowConfig.DISCARD_ORE, windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', 'ore'), 0.4, font=Text.DISCARD_FONT)
-        self.discardElements['lumber'] = discardLumber
-        self.discardElements['brick'] = discardBrick
-        self.discardElements['sheep'] = discardSheep
-        self.discardElements['grain'] = discardGrain
-        self.discardElements['ore'] = discardOre
+        self.stealElements = dict()
+        self.initDiscardElements()
+        self.initStealElements()
         self.initRoadsWrapper()
         self.setupMode = True
         players1 = [i for i in range(4, 8)]
         players2 = [i for i in range(4)]
         self.setupPlayOrder = players2 + players1[::-1]
         self.startSetupTurn()
+
+    def initDiscardElements(self):
+        resources = ['lumber', 'brick', 'sheep', 'grain', 'ore']
+        for resource in resources:
+            discardButton = Button(windowConfig.DISCARD[resource], windowConfig.DISCARD_SIZE, 'X', Colors.BUTTON_COLORS, ('discard', resource), 0.4, font=Text.DISCARD_FONT)
+            self.discardElements[resource] = discardButton
+
+    def initStealElements(self):
+        for i in range(4):
+            stealButton = Button(windowConfig.STEAL[i], windowConfig.STEAL_SIZE, 'Steal', Colors.BUTTON_COLORS, ('stealConfirm', self.board.players[i]), 0.4, font=Text.STEAL_FONT)
+            self.stealElements[i] = stealButton
 
     # Starts the turn during the Set-up Phase
     def startSetupTurn(self):
@@ -130,6 +147,8 @@ class CatanGame(PygameGame):
                 x1 = leftOffset + (j + 1) * self.hexWidth
                 y0 = i * self.ySpacing + self.boardBounds[1]
                 y1 = y0 + self.hexHeight
+                if (tile.bounds == None):
+                    tile.bounds = (x0, y0, x1, y1)
                 hexPoints = CatanMath.getHexagonPoints((x0, y0, x1, y1))
                 self.initRoads(tile, (x0, y0, x1, y1))
 
@@ -177,11 +196,21 @@ class CatanGame(PygameGame):
     # Handles end turn clicks
     def endTurn(self):
         if (not self.setupMode):
-            self.turn += 1
-            self.currentPlayer = self.turn % 4
-            self.startTurn()
+            victory = self.checkVictory()
+            if (victory != None):
+                print(victory.index, 'wins!')
+                self.setActiveMode('menu')
+            else:    
+                self.turn += 1
+                self.currentPlayer = self.turn % 4
+                self.startTurn()
         else:
             self.startSetupTurn()
+    
+    def checkVictory(self):
+        for player in self.board.players:
+            if (player.victoryPoints >= 10):
+                return player
     
     # Collects resources for all players given current roll
     def collectResources(self):
@@ -205,7 +234,8 @@ class CatanGame(PygameGame):
             if (player.countCards() > 7):
                 self.toDiscard.append(player.index)
         self.auxPlayer = self.currentPlayer
-        self.startDiscard()
+        if (len(self.toDiscard) > 0):
+            self.startDiscard()
     
     def startDiscard(self):
         self.discardMode = True
@@ -219,11 +249,11 @@ class CatanGame(PygameGame):
         if (len(self.toDiscard) == 0):
             self.discardMode = False
             self.currentPlayer = self.auxPlayer
+            self.robberMode()
         else:
             self.startDiscard()
 
     def discardResource(self, player, resource):
-        print(2)
         player.resources[resource] -= 1
         self.checkDiscardConditions(player)
         self.checkEndTurnConditions(player)
@@ -236,8 +266,31 @@ class CatanGame(PygameGame):
             else:
                 self.discardElements[resource].isDisabled = False
 
+    # TODO: Make this recursive
+    # i.e. do two halves and have each possible segment return a list of roads connected
+    def checkLongestRoad(self, player):
+        pass
+    #     if (len(player.roads) >= 5):
+    #         mainSet = copy.copy(player.roads)
+    #         seen = set()
+    #         first = random.choice(list(mainSet))
+    #         mainSet.remove(first)
+    #         seen.add(first)
+    
+    # def recursiveLongestRoad(self, player):
+    #     if ():
+    #         pass
+    #     else:
+    #         road1, road2 = first.getRoads(self.board)
+    #         for edge in road1:
+    #             if (self.board.edges[edge] in mainSet):
+    #                 seen.add(self.board.edges[edge])
+    #         for edge in road2:
+    #             if (self.board.edges[edge] in mainSet):
+    #                 seen.add(self.board.edges[edge])
+            
     def checkEndTurnConditions(self, player):
-        if (self.discardMode and self.board.players[self.currentPlayer].countCards() > player.discardGoal):
+        if ((self.discardMode and self.board.players[self.currentPlayer].countCards() > player.discardGoal) or self.inRobberMode or self.stealMode):
             tmpButton = Button(windowConfig.END_TURN, None, None, None, None)
             for element in self.elements:
                 if (element == tmpButton):
@@ -272,16 +325,16 @@ class CatanGame(PygameGame):
         self.selectElements = set()
         if (build == 'settlement'):
             for node in self.board.nodes:
-                if (node.nodeLevel == 0 and node.buildable):
+                if (node.nodeLevel == 0 and node.buildable and (self.setupMode or node.checkOwnedRoads(self.board, self.board.players[self.currentPlayer]))):
                     cx, cy = node.pos
-                    nodeButton = Button((cx, cy), windowConfig.BUILD_BUTTON_SIZE,
+                    nodeButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
                             None, Colors.BUTTON_COLORS, ('buildConfirm', (node, self.board.players[self.currentPlayer])), 0.4)
                     self.selectElements.add(nodeButton)
         elif (build == 'city'):
             for node in self.board.nodes:
                 if (node.nodeLevel == 1 and node.owner.index == self.currentPlayer):
                     cx, cy = node.pos
-                    nodeButton = Button((cx, cy), windowConfig.BUILD_BUTTON_SIZE,
+                    nodeButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
                             None, Colors.BUTTON_COLORS, ('buildConfirm', (node, self.board.players[self.currentPlayer])), 0.4)
                     self.selectElements.add(nodeButton)
         elif (build == 'road'):
@@ -306,9 +359,52 @@ class CatanGame(PygameGame):
                     edge = self.board.edges[i]
                     if (edge.road == None):
                         cx, cy = edge.pos
-                        roadButton = Button((cx, cy), windowConfig.BUILD_BUTTON_SIZE,
+                        roadButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
                             None, Colors.BUTTON_COLORS, ('buildConfirm', (edge, self.board.players[self.currentPlayer])), 0.4)
                         self.selectElements.add(roadButton)
+
+    def robberMode(self):
+        self.inRobberMode = True
+        self.selectElements = set()
+        for i in range(self.board.q):
+            row = copy.copy(self.board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = self.board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = self.board.hexBoard[i][j+firstIndex]
+                if (not tile.hasRobber):
+                    x0, y0, x1, y1 = tile.bounds
+                    hexHeight = y1 - y0
+                    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+                    tileButton = Button((cx, cy + 0.25 * hexHeight), windowConfig.SELECT_BUTTON_SIZE,
+                        None, Colors.BUTTON_COLORS, ('placeRobber', (tile, self.board.players[self.currentPlayer])), 0.4)
+                    self.selectElements.add(tileButton)
+                else:
+                    self.oldRobberPos = (i, j+firstIndex)
+
+    def stealChoice(self, stealInput):
+        self.inRobberMode = False
+        self.stealMode = True
+        self.checkEndTurnConditions(self.board.players[self.currentPlayer])
+        tile, player = stealInput
+        victims = set()
+        for node in tile.nodes:
+            nodeID = node.id
+            owner = self.board.nodes[nodeID].owner
+            if (owner != None and owner != player and owner.countCards() > 0):
+                victims.add(owner.index)
+        if (len(victims) > 0):
+            for key in self.stealElements:
+                if (key in victims):
+                    self.stealElements[key].isDisabled = False
+                else:
+                    self.stealElements[key].isDisabled = True
+        else:
+            self.stealMode = False
+            self.checkEndTurnConditions(self.board.players[self.currentPlayer])
 
     # Checks for total victory points of the current player.
     def checkVictoryPoints(self):
@@ -345,6 +441,12 @@ class CatanGame(PygameGame):
                 y1 = y0 + height
                 if (mx > x0 and mx < x1 and my > y0 and my < y1):
                     self.discardElements[key].onClick(self)
+            for key in self.stealElements:
+                x0, y0, width, height = self.stealElements[key].getRectArgs()
+                x1 = x0 + width
+                y1 = y0 + height
+                if (mx > x0 and mx < x1 and my > y0 and my < y1):
+                    self.stealElements[key].onClick(self)
 
     # Redraws everything on the surface
     def redrawAll(self, screen):
@@ -361,6 +463,22 @@ class CatanGame(PygameGame):
     
     # Draws the Menu Mode Components
     def drawMenu(self, screen):
+        bgImage = pygame.image.load("resources/assets/images/bgCatan.jpg")
+        bgPos = bgImage.get_rect()
+        bgPos.center = (self.cx, self.cy)
+        screen.blit(bgImage, bgPos)
+        logoImage = pygame.image.load("resources/assets/images/logoCatan.png")
+        logoWidth, logoHeight = logoImage.get_rect().size
+        scaleFactor = windowConfig.LOGO_SCALE
+        logoImage = pygame.transform.scale(logoImage, (int(scaleFactor * logoWidth), int(scaleFactor * logoHeight)))
+        logoPos = logoImage.get_rect()
+        logoPos.center = windowConfig.LOGO
+        screen.blit(logoImage, logoPos)
+        x, y = windowConfig.MENU_CONTAINER
+        width, height = windowConfig.MENU_CONTAINER_SIZE
+        container = pygame.Surface((width, height), pygame.SRCALPHA)
+        container.fill(Colors.BLACK_ALPHA)
+        screen.blit(container, (x, y))
         for element in self.elements:
             element.draw(screen)
 
@@ -376,12 +494,15 @@ class CatanGame(PygameGame):
             element.draw(screen)
         for key in self.buildElements:
             self.buildElements[key].draw(screen)
-        if (self.inBuildMode):
+        if (self.inBuildMode or self.inRobberMode):
             for selectElement in self.selectElements:
                 selectElement.draw(screen)
         if (self.discardMode):
             for key in self.discardElements:
                 self.discardElements[key].draw(screen)
+        if (self.stealMode):
+            for key in self.stealElements:
+                self.stealElements[key].draw(screen)
         self.drawCurrentPlayer(screen)
         self.drawResources(screen)
     
@@ -389,6 +510,7 @@ class CatanGame(PygameGame):
     def drawResources(self, screen):
         x, y = windowConfig.RESOURCES
         width, height = windowConfig.RESOURCES_SIZE
+        pygame.draw.rect(screen, Colors.WHITE, (x, y, width, height))
         pygame.draw.rect(screen, Colors.BLACK, (x, y, width, height), 1)
         resources = self.board.players[self.currentPlayer].resources
         resourceText = f"{resources['lumber']} Lumber, {resources['brick']} Brick, {resources['sheep']} Sheep, {resources['grain']} Grain, {resources['ore']} Ore"
@@ -400,12 +522,17 @@ class CatanGame(PygameGame):
     # Draws the current player's on the screen
     def drawCurrentPlayer(self, screen):
         currentPlayer = self.currentPlayer + 1
-        if (not self.discardMode):
-            currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer}\'s Turn', True, Colors.BLACK)
-        else:
+        if (self.discardMode):
             player = self.board.players[self.currentPlayer]
             remaining = player.countCards() - player.discardGoal
             currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer} Must Discard {remaining} Cards!', True, Colors.RED_1)
+        elif (self.inRobberMode):
+            currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer} Must Move the Robber!', True, Colors.RED_1)
+        elif (self.stealMode):
+            currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer} May Steal!', True, Colors.RED_1)
+        else:
+            currentPlayerText = Text.CURRENT_PLAYER_FONT.render(f'Player {currentPlayer}\'s Turn', True, Colors.BLACK)
+        
         currentPlayerSurf = currentPlayerText.get_rect()
         currentPlayerSurf.right = windowConfig.CURRENT_PLAYER[0]
         currentPlayerSurf.centery = windowConfig.CURRENT_PLAYER[1]
@@ -413,6 +540,7 @@ class CatanGame(PygameGame):
 
     # Draws the Catan Board
     def drawBoard(self, screen):
+        pygame.draw.rect(screen, Colors.BLUE, (0,0,self.width,self.height))
         for i in range(self.board.q):
             row = copy.copy(self.board.hexBoard[i])
             colCtr = 0
@@ -512,7 +640,7 @@ class CatanGame(PygameGame):
                 point1 = hexPoints[nodes[0]]
                 point2 = hexPoints[nodes[1]]
                 triangle = CatanMath.getEqTriangle(screen, point1, point2, center)
-                gfxdraw.aapolygon(screen, triangle, Colors.GOLD_1)
+                gfxdraw.aapolygon(screen, triangle, Colors.GOLD_2)
                 cx, cy = triangle[2]
                 cx, cy = int(cx), int(cy)
                 portSize = int(0.2 * self.boardSize / 4)

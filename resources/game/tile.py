@@ -6,6 +6,7 @@ class Tile(object):
         self.nodes = []
         self.type = None
         self.hasRobber = False
+        self.bounds = None
 
     def __repr__(self):
         r = self.pos[0]
