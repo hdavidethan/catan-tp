@@ -25,7 +25,7 @@ class Colors(object):
 
     # Player Colors
     PLAYER = dict()
-    PLAYER[0] = (pygame.Color('0xd0f2e3'), BLACK)
+    PLAYER[0] = (pygame.Color('0xff9b42'), BLACK)
     PLAYER[1] = (pygame.Color('0x92140c'), WHITE)
     PLAYER[2] = (pygame.Color('0x002642'), WHITE)
     PLAYER[3] = (pygame.Color('0x8cb369'), BLACK)

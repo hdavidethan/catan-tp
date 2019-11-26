@@ -25,7 +25,8 @@ class Board(object):
         self.assignTypes()
         self.assignNumbers()
 
-        if (AIGame == False):
+        self.AIGame = AIGame
+        if (self.AIGame == False):
             self.players = [Player(0), Player(1), Player(2), Player(3)]
         else:
             self.players = [Player(0), AIPlayer(1), AIPlayer(2), AIPlayer(3)]

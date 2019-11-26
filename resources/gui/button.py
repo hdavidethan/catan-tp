@@ -43,7 +43,10 @@ class Button(Element):
         if (not self.isDisabled):
             if (isinstance(self.binding, tuple)):
                 if (self.binding[0] == 'changeMode'):
-                    game.setActiveMode(self.binding[1])
+                    if ('AI' in self.binding):
+                        game.setActiveMode(self.binding[1], AIGame=True)
+                    else:
+                        game.setActiveMode(self.binding[1])
                 elif (self.binding[0] == 'endTurn'):
                     if (not game.discardMode):
                         game.endTurn()

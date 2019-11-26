@@ -1,3 +1,5 @@
+import copy
+
 class Edge(object):
     def __init__(self, id):
         self.road = None
@@ -27,8 +29,8 @@ class Edge(object):
                     selfIndex = tile.edges.index(self)
                     otherIndex = tile.edges.index(other)
                     if (abs(selfIndex - otherIndex) == 1):
-                        return True
-        return False
+                        return True, tile
+        return False, None
     
     def getRoads(self, board):
         for i in range(board.q):

@@ -83,6 +83,16 @@ class Utils(object):
     def getProbabilityFromNumber(n):
         probabilities = {2:1, 3:2, 4:3, 5:4, 6:5, 8:5, 9:4, 10:3, 11:2, 12:1}
         return probabilities[n]
+    
+    # Gets the fill of each hex depending on the Tile type
+    @staticmethod
+    def getFill(tile):
+        colors = {'forest':Colors.FOREST, 'desert':Colors.DESERT,
+                  'hills':Colors.HILLS, 'mountains':Colors.MOUNTAINS,
+                  'pasture':Colors.PASTURE, 'fields':Colors.FIELDS,
+                  None:Colors.WHITE}
+        tileFill = colors[tile.type]
+        return tileFill
 
     # @staticmethod
     # def getPlayerFromColor(players, color):
@@ -92,4 +102,11 @@ class Utils(object):
     #             player = key
     #         print(player, Colors.PLAYER[key][0], color)
     #     return players[player] if player is not None else None
+
+    # # Checks if given position is within the bounds.
+    # @staticmethod
+    # def inBounds(pos, bounds):
+    #     x, y = pos
+    #     x0, y0, x1, y1 = bounds
+    #     return (x > x0 and x < x1 and y > y0 and y < y1)
         

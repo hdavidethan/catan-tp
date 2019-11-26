@@ -16,3 +16,10 @@ class Text(object):
     ROBBER_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 20*sizeFactor)
     DISCARD_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 18*sizeFactor)
     STEAL_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 18*sizeFactor)
+
+    # Text Constants
+    BUILD = dict()
+    BUILD['road'] = "Build Road"
+    BUILD['settlement'] = "Build Settlement"
+    BUILD['city'] = "Build City"
+    BUILD['devCard'] = "Buy Dev Card"
