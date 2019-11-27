@@ -7,8 +7,6 @@ from config.colors import Colors
 from config.text import Text
 import pygame
 
-# Valid Bindings: changeMode, quit, pause
-
 class Button(Element):
     def __init__(self, pos, size, text, colors, binding, radius=0, isDisabled=False, font=Text.BUTTON_FONT):
         super().__init__(pos, size)
