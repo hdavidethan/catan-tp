@@ -39,7 +39,8 @@ class AIPlayer(Player):
         if (road[1]):
             validRoads = self.getLegalRoads(game)
             return [('buildRoad', validRoads)]
-        else:
+        if (settlement[1]):
+            validSettlements = self.getLegalSettlements(game)
             return []
 
     def getLegalRoads(self, game):
@@ -61,7 +62,9 @@ class AIPlayer(Player):
                     for i in tmp:
                         seen.add(game.board.edges[i])
         return seen
-        
+    
+    def getLegalSettlements(self, game):
+        pass
 
     def chooseBestNode(self, game):
         nodeList = []

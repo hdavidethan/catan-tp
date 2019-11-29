@@ -207,7 +207,7 @@ class CatanGame(PygameGame):
     # Checks if any player has achieved 10 victory points. Returns the player.
     def checkVictory(self):
         for player in self.board.players:
-            if (player.victoryPoints >= 10):
+            if (player.victoryPoints + player.devCards['victoryPoint'] >= 10):
                 return player
     
     # Collects resources for all players given current roll
@@ -235,6 +235,10 @@ class CatanGame(PygameGame):
         self.auxPlayer = self.currentPlayer
         if (len(self.toDiscard) > 0):
             self.startDiscard()
+        else:
+            self.discardMode = False
+            self.currentPlayer = self.auxPlayer
+            self.robberMode()
     
     # Starts the round of discarding extra cards when 7 is rolled.
     def startDiscard(self):
@@ -247,12 +251,12 @@ class CatanGame(PygameGame):
     
     # Ends the discard turn or discard round.
     def endDiscard(self):
-        if (len(self.toDiscard) == 0):
+        if (len(self.toDiscard) != 0):
+            self.startDiscard()
+        else:
             self.discardMode = False
             self.currentPlayer = self.auxPlayer
             self.robberMode()
-        else:
-            self.startDiscard()
 
     # Removes one of the given resource from the player and update information
     def discardResource(self, player, resource):
@@ -322,7 +326,7 @@ class CatanGame(PygameGame):
         cityCondition = ((player.resources['ore'] >= 3 and player.resources['grain'] >= 2
                             and len(player.settlements) > 0) and not self.discardMode)
         devCardCondition = ((not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
-                            and player.resources['grain'] >= 1) and not self.discardMode) and False # TODO: NOT YET DONE. WILL FIX THIS ONCE DEV CARDS ARE ADDED
+                            and player.resources['grain'] >= 1) and not self.discardMode)
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))
         for build in conditions:
@@ -388,6 +392,16 @@ class CatanGame(PygameGame):
                         roadButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
                             None, Colors.BUTTON_COLORS, ('buildConfirm', (edge, self.board.players[self.currentPlayer])), 0.4)
                         self.selectElements.add(roadButton)
+        elif (build == 'devCard'):
+            devCards = ['knight'] * 14 + ['yearOfPlenty'] * 2 + ['roadBuilding'] * 2 + ['monopoly'] * 2 + ['victoryPoint'] * 5
+            chosenCard = random.choice(devCards)
+            devCards.remove(chosenCard)
+            player = self.board.players[self.currentPlayer]
+            player.resources['grain'] -= 1
+            player.resources['sheep'] -= 1
+            player.resources['ore'] -= 1
+            player.devCards[chosenCard] += 1
+            self.checkBuildConditions(player)
 
     # Starts the Robber Mode and checks possible robber positions.
     def robberMode(self):
@@ -555,6 +569,7 @@ class CatanGame(PygameGame):
                 self.stealElements[key].draw(screen, self)
         self.drawCurrentPlayer(screen)
         self.drawResources(screen)
+        self.drawDevCards(screen)
     
     # Draws the resource panel at the bottom of the screen
     def drawResources(self, screen):
@@ -568,9 +583,24 @@ class CatanGame(PygameGame):
             resources = self.board.players[0].resources
         resourceText = f"{resources['lumber']} Lumber, {resources['brick']} Brick, {resources['sheep']} Sheep, {resources['grain']} Grain, {resources['ore']} Ore"
         resourceLabel = Text.RESOURCE_FONT.render(resourceText, True, Colors.BLACK)
-        resourceSurf = resourceLabel.get_rect()
-        resourceSurf.center = pygame.Rect(x, y, width, height).center
-        screen.blit(resourceLabel, resourceSurf)
+        resourcePos = resourceLabel.get_rect()
+        resourcePos.center = pygame.Rect(x, y, width, height).center
+        screen.blit(resourceLabel, resourcePos)
+    
+    def drawDevCards(self, screen):
+        x, y = windowConfig.DEVCARDS
+        width, height = windowConfig.DEVCARDS_SIZE
+        pygame.draw.rect(screen, Colors.WHITE, (x, y, width, height))
+        pygame.draw.rect(screen, Colors.BLACK, (x, y, width, height), 1)
+        if (not self.board.AIGame):
+            devCards = self.board.players[self.currentPlayer].devCards
+        else:
+            devCards = self.board.players[0].devCards
+        devCardText = f"{devCards['knight']} Knight, {devCards['yearOfPlenty']} Yr of Plenty, {devCards['monopoly']} Monopoly, {devCards['roadBuilding']} Rd Bldg"
+        devCardLabel = Text.RESOURCE_FONT.render(devCardText, True, Colors.BLACK)
+        devCardPos = devCardLabel.get_rect()
+        devCardPos.center = pygame.Rect(x, y, width, height).center
+        screen.blit(devCardLabel, devCardPos)
 
     # Draws the current player's on the screen
     def drawCurrentPlayer(self, screen):

@@ -29,9 +29,9 @@ class windowConfig(object):
     # Game Scorecards
     SCORE_1 = (0, 0.8 * HEIGHT)
     SCORE_2 = (0, 0)
-    SCORE_3 = (0.8 * WIDTH, 0)
-    SCORE_4 = (0.8 * WIDTH, 0.8 * HEIGHT)
-    SCORE_SIZE = (0.2 * WIDTH, 0.2 * HEIGHT)
+    SCORE_3 = (0.78 * WIDTH, 0)
+    SCORE_4 = (0.78 * WIDTH, 0.8 * HEIGHT)
+    SCORE_SIZE = (0.22 * WIDTH, 0.2 * HEIGHT)
 
     # GUI
     CURRENT_PLAYER = (0.98 * WIDTH, 0.705 * HEIGHT)
@@ -44,6 +44,9 @@ class windowConfig(object):
 
     RESOURCES = (0.28 * WIDTH, 0.95 * HEIGHT)
     RESOURCES_SIZE = (0.44 * WIDTH, 0.05 * HEIGHT)
+
+    DEVCARDS = (0.27 * WIDTH, 0)
+    DEVCARDS_SIZE = (0.46 * WIDTH, 0.05 * HEIGHT)
 
     BUILD = dict()
     BUILD['road'] = (0.1 * WIDTH, 0.55 * HEIGHT)
