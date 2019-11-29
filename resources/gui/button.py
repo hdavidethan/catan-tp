@@ -71,6 +71,8 @@ class Button(Element):
                     currentPlayer.resources[resource] += 1
                     game.stealMode = False
                     game.checkEndTurnConditions(currentPlayer)
+                elif (self.binding[0] == 'devCard'):
+                    game.startDevCard()
                 elif (self.binding[0] == 'quit'):
                     game._running = False
     

@@ -47,6 +47,8 @@ class windowConfig(object):
 
     DEVCARDS = (0.27 * WIDTH, 0)
     DEVCARDS_SIZE = (0.46 * WIDTH, 0.05 * HEIGHT)
+    USE_DEVCARD = (0.1 * WIDTH, 0.24 * HEIGHT)
+    USE_DEVCARD_SIZE = (0.18 * WIDTH, 0.05 * HEIGHT)
 
     BUILD = dict()
     BUILD['road'] = (0.1 * WIDTH, 0.55 * HEIGHT)
@@ -63,6 +65,13 @@ class windowConfig(object):
     DISCARD['sheep'] = (0.49 * WIDTH, 0.92 * HEIGHT)
     DISCARD['grain'] = (0.56 * WIDTH, 0.92 * HEIGHT)
     DISCARD['ore'] = (0.63 * WIDTH, 0.92 * HEIGHT)
+
+    DEVCARD_CHOICE = dict()
+    DEVCARD_CHOICE['knight'] = (0.35 * WIDTH, 0.08 * HEIGHT)
+    DEVCARD_CHOICE['yearOfPlenty'] = (0.45 * WIDTH, 0.08 * HEIGHT)
+    DEVCARD_CHOICE['monopoly'] = (0.55 * WIDTH, 0.08 * HEIGHT)
+    DEVCARD_CHOICE['roadBuilding'] = (0.65 * WIDTH, 0.08 * HEIGHT)
+    DEVCARD_CHOICE_SIZE = (0.04 * sizeFactor, 0.04 * sizeFactor)
 
     STEAL = dict()
     STEAL[0] = (0.25 * WIDTH, 0.82 * HEIGHT)

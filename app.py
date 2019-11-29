@@ -39,6 +39,7 @@ class CatanGame(PygameGame):
         self.discardMode = False
         self.inRobberMode = False
         self.stealMode = False
+        self.devCardMode = False
         self.toDiscard = []
         self.auxPlayer = None
         self.board = Board(AIGame=AIGame)
@@ -83,14 +84,18 @@ class CatanGame(PygameGame):
             self.elements.add(Scorecard(player, scores[scoreCounter], windowConfig.SCORE_SIZE))
             scoreCounter += 1
         endTurnButton = Button(windowConfig.END_TURN, windowConfig.END_TURN_SIZE, 'End Turn', Colors.BUTTON_COLORS, ('endTurn', None), 0.4)
+        useDevCardButton = Button(windowConfig.USE_DEVCARD, windowConfig.USE_DEVCARD_SIZE, 'Use Dev Card', Colors.BUTTON_COLORS, ('devCard', None), 0.4, True, Text.BUILD_FONT)
         self.elements.add(endTurnButton)
+        self.elements.add(useDevCardButton)
         self.elements.add(self.dice1)
         self.elements.add(self.dice2)
         self.buildElements = dict()
         self.discardElements = dict()
+        self.devCardElements = dict()
         self.stealElements = dict()
         self.initBuildElements()
         self.initDiscardElements()
+        self.initDevCardElements()
         self.initStealElements()
         self.initRoadsWrapper()
         self.setupMode = True
@@ -119,6 +124,13 @@ class CatanGame(PygameGame):
         for i in range(4):
             stealButton = Button(windowConfig.STEAL[i], windowConfig.STEAL_SIZE, 'Steal', Colors.BUTTON_COLORS, ('stealConfirm', self.board.players[i]), 0.4, font=Text.STEAL_FONT)
             self.stealElements[i] = stealButton
+
+    # Initializes the discard button elements for Discard Mode
+    def initDevCardElements(self):
+        devCards = ['knight', 'yearOfPlenty', 'monopoly', 'roadBuilding']
+        for devCard in devCards:
+            devCardButton = Button(windowConfig.DEVCARD_CHOICE[devCard], windowConfig.DEVCARD_CHOICE_SIZE, '*', Colors.BUTTON_COLORS, ('confirmDevCard', devCard), 0.4, font=Text.DISCARD_FONT)
+            self.devCardElements[devCard] = devCardButton
 
     # Starts the turn during the Set-up Phase
     def startSetupTurn(self):
@@ -249,6 +261,11 @@ class CatanGame(PygameGame):
         self.checkDiscardConditions(player)
         self.checkEndTurnConditions(player)
     
+    def startDevCard(self):
+        self.devCardMode = True
+        player = self.board.players[self.currentPlayer]
+        self.devCardChoiceConditions(player)
+    
     # Ends the discard turn or discard round.
     def endDiscard(self):
         if (len(self.toDiscard) != 0):
@@ -263,6 +280,30 @@ class CatanGame(PygameGame):
         player.resources[resource] -= 1
         self.checkDiscardConditions(player)
         self.checkEndTurnConditions(player)
+
+    def useDevCardConditions(self, player):
+        tmpButton = Button(windowConfig.USE_DEVCARD, None, None, None, None)
+        total = 0
+        for devCard in player.devCards:
+            if (devCard != 'victoryPoint'):
+                total += player.devCards[devCard]
+        if (total > 0):
+            for element in self.elements:
+                if (element == tmpButton):
+                    element.isDisabled = False
+        else:
+            for element in self.elements:
+                if (element == tmpButton):
+                    element.isDisabled = True     
+
+    def devCardChoiceConditions(self, player):
+        for devCard in player.devCards:
+            if (devCard != 'victoryPoint'):
+                count = player.devCards[devCard]
+                if (player.devCards[devCard] < 1):
+                    self.devCardElements[devCard].isDisabled = True
+                else:
+                    self.devCardElements[devCard].isDisabled = False
 
     # Checks if it is possible to discard certain resources. (i.e. is > 0)
     def checkDiscardConditions(self, player):
@@ -402,6 +443,7 @@ class CatanGame(PygameGame):
             player.resources['ore'] -= 1
             player.devCards[chosenCard] += 1
             self.checkBuildConditions(player)
+            self.useDevCardConditions(player)
 
     # Starts the Robber Mode and checks possible robber positions.
     def robberMode(self):
@@ -461,7 +503,7 @@ class CatanGame(PygameGame):
             if (key == pygame.K_m):
                 self.setActiveMode('menu')
             elif (key == pygame.K_r):
-                self.resetGame()
+                self.resetGame(self.board.AIGame)
             # HACK: CHEAT FOR DEBUG ONLY
             elif (key == pygame.K_c):
                 for player in self.board.players:
@@ -567,6 +609,9 @@ class CatanGame(PygameGame):
         if (self.stealMode):
             for key in self.stealElements:
                 self.stealElements[key].draw(screen, self)
+        if (self.devCardMode):
+            for key in self.devCardElements:
+                self.devCardElements[key].draw(screen, self)
         self.drawCurrentPlayer(screen)
         self.drawResources(screen)
         self.drawDevCards(screen)
