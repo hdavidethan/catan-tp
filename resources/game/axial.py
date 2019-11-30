@@ -1,3 +1,9 @@
+#########################################################################
+# Axial File
+# Contains axial functions for the Catan Board.
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 from resources.game.node import Node
 from resources.game.tile import Tile
 from resources.game.edge import Edge

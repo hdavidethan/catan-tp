@@ -1,3 +1,9 @@
+#########################################################################
+# Edge File
+# Contains and handles Edges on the Catan Board
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import copy
 
 class Edge(object):

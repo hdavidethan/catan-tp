@@ -1,3 +1,9 @@
+#########################################################################
+# Text File
+# Contains text and font configurations for the app
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import pygame
 from config.config import windowConfig
 pygame.font.init()

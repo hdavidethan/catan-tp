@@ -1,3 +1,9 @@
+#########################################################################
+# Tile File
+# Contains Tile class; creates and stores Tiles and its contents
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 class Tile(object):
     def __init__(self, r, q):
         self.pos = (r, q)

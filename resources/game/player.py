@@ -1,3 +1,9 @@
+#########################################################################
+# Player File
+# Contains the Player class for the Catan Game
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 from config.colors import Colors
 
 class Player(object):

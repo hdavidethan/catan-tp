@@ -1,3 +1,9 @@
+#########################################################################
+# AIPlayer File
+# Contains the AIPlayer subclass of Player; creates and controls the AI
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import random, copy
 from resources.game.player import Player
 from config.colors import Colors

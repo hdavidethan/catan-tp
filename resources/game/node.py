@@ -1,3 +1,9 @@
+#########################################################################
+# Node File
+# Creates and handles the Nodes on the Catan board
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import copy
 from resources.game.utils import Utils
 

@@ -1,3 +1,9 @@
+#########################################################################
+# Board File
+# Contains Board class; stores and creates the entire Catan board
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 from resources.game.axial import *
 from resources.game.node import Node
 from resources.game.tile import Tile

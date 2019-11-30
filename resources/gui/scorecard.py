@@ -1,3 +1,9 @@
+#########################################################################
+# Scorecard File
+# Contains the Scorecard subclass of Element; shows player scores
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import pygame
 from resources.gui.element import Element
 from config.colors import Colors

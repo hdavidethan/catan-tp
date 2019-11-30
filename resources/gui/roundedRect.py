@@ -1,3 +1,9 @@
+#########################################################################
+# RoundedRect File
+# Contains the function to draw a rounded rectangle
+# Code retrieved from Stack Overflow. Credits are indicated below.
+#########################################################################
+
 import pygame
 from pygame import *
 

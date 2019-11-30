@@ -1,3 +1,9 @@
+#########################################################################
+# Button File
+# Contains the Button subclass of Element; creates buttons
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 from resources.gui.element import Element
 from resources.gui.roundedRect import drawRoundedRect
 from resources.game.node import Node

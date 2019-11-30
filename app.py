@@ -64,9 +64,9 @@ class CatanGame(PygameGame):
     def initMenu(self):
         self.isPaused = False
         self.elements = set()
-        menuButton1 = Button(windowConfig.MENU_B1,windowConfig.MENU_B1_SIZE, 'Start Game', Colors.BUTTON_COLORS, ('changeMode', 'game'), 0.4)
+        menuButton1 = Button(windowConfig.MENU_B1,windowConfig.MENU_B1_SIZE, 'Hotseat Game', Colors.BUTTON_COLORS, ('changeMode', 'game'), 0.4)
         menuButton2 = Button(windowConfig.MENU_B2, windowConfig.MENU_B2_SIZE, 'Quit Game', Colors.BUTTON_COLORS, ('quit', None), 0.4)
-        menuButton3 = Button(windowConfig.MENU_B3, windowConfig.MENU_B1_SIZE, 'Start AI Game', Colors.BUTTON_COLORS, ('changeMode', 'game', 'AI'), 0.4)
+        menuButton3 = Button(windowConfig.MENU_B3, windowConfig.MENU_B1_SIZE, 'AI Game', Colors.BUTTON_COLORS, ('changeMode', 'game', 'AI'), 0.4)
         self.elements.add(menuButton1)
         self.elements.add(menuButton2)
         self.elements.add(menuButton3)

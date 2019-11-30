@@ -1,3 +1,9 @@
+#########################################################################
+# Colors File
+# Contains the Color configurations for the entire Catan app
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import pygame
 
 class Colors(object):

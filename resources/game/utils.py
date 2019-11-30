@@ -1,5 +1,5 @@
 #########################################################################
-# Config File
+# Utils File
 # Contains utility functions, i.e. Math
 # Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
 #########################################################################

@@ -1,3 +1,9 @@
+#########################################################################
+# Dice File
+# Contains the Dice subclass of Element; generates the dice rolls
+# Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+#########################################################################
+
 import pygame, random
 from pygame import gfxdraw
 from resources.gui.element import Element
