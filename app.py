@@ -314,29 +314,6 @@ class CatanGame(PygameGame):
             else:
                 self.discardElements[resource].isDisabled = False
 
-    # TODO: Make this recursive
-    # i.e. do two halves and have each possible segment return a list of roads connected
-    def checkLongestRoad(self, player):
-        pass
-        # TODO: ALl following code is indented 1 tab to the right.
-        #     if (len(player.roads) >= 5):
-        #         mainSet = copy.copy(player.roads)
-        #         seen = set()
-        #         first = random.choice(list(mainSet))
-        #         mainSet.remove(first)
-        #         seen.add(first)
-        
-        # def recursiveLongestRoad(self, player):
-        #     if ():
-        #         pass
-        #     else:
-        #         road1, road2 = first.getRoads(self.board)
-        #         for edge in road1:
-        #             if (self.board.edges[edge] in mainSet):
-        #                 seen.add(self.board.edges[edge])
-        #         for edge in road2:
-        #             if (self.board.edges[edge] in mainSet):
-        #                 seen.add(self.board.edges[edge])
     
     # Checks if the turn can be ended by the current player.
     def checkEndTurnConditions(self, player):
@@ -489,13 +466,32 @@ class CatanGame(PygameGame):
         else:
             self.stealMode = False
             self.checkEndTurnConditions(self.board.players[self.currentPlayer])
+    
+    def checkForLongestRoad(self):
+        maxPlayer = None
+        maxLength = -1
+        for player in self.board.players:
+            length = player.longestRoad
+            if (length > maxLength):
+                maxLength = length
+                maxPlayer = player
+        if (maxPlayer != None and maxLength >= 5):
+            for player in self.board.players:
+                if (player != maxPlayer):
+                    player.hasLongestRoad = False
+                else:
+                    player.hasLongestRoad = True
 
     # Checks for total victory points of the current player.
     def checkVictoryPoints(self):
         player = self.board.players[self.currentPlayer]
         settlements = len(player.settlements)
         cities = len(player.cities)
-        player.victoryPoints = settlements + 2 * cities
+        if (player.hasLongestRoad):
+            longestRoad = 2
+        else:
+            longestRoad = 0
+        player.victoryPoints = settlements + 2 * cities + longestRoad
 
     # Handles keystrokes
     def keyPressed(self, key, mod):
@@ -510,6 +506,8 @@ class CatanGame(PygameGame):
                     player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
             elif (key == pygame.K_ESCAPE):
                 self.isPaused = not self.isPaused
+            elif (key == pygame.K_e):
+                self.board.players[self.currentPlayer].countRoads(self)
         elif (self.activeMode == 'menu'):
             if (key == pygame.K_a):
                 self.setActiveMode('game', AIGame=True)

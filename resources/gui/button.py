@@ -124,5 +124,5 @@ class Button(Element):
             buildObject.road = player.bgColor
         game.inBuildMode = False
         game.checkBuildConditions(player)
-        game.checkLongestRoad(player)
+        player.longestRoad = player.countRoads(game)
         game.checkVictoryPoints()

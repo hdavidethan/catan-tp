@@ -58,3 +58,17 @@ class Edge(object):
                     roads2 = node2.getRoads(board)
                     roads2.remove(self)
                     return roads1, roads2
+    
+    def getNodes(self, board):
+        for i in range(board.q):
+            row = copy.copy(board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = board.hexBoard[i][j+firstIndex]
+                if (self in tile.edges):
+                    roadIndex = tile.edges.index(self)
+                    return tile.nodes[roadIndex], tile.nodes[(roadIndex+1)%6]

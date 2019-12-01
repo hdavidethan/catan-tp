@@ -90,3 +90,19 @@ class AIPlayer(Player):
                 maxValue = value
                 maxIndex = i
         return maxIndex
+    
+    def chooseClosestTile(self, game):
+        ownedTiles = set()
+        for i in range(board.q):
+            row = copy.copy(board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen):
+                tile = board.hexBoard[i][j+firstIndex]
+                for node in tile.nodes:
+                    if node.owner == self:
+                        pass
+        return seen

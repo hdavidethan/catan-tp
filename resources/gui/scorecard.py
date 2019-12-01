@@ -33,7 +33,19 @@ class Scorecard(Element):
             text = [f'VP: {self.player.victoryPoints}', f'LR: {self.player.longestRoad}', f'LA: {self.player.largestArmy}']
         labels = []
         for i in range(3):
-            label = Text.SCORE_FONT.render(text[i], True, self.player.textColor)
+            # Longest Road Color Handler
+            if (i != 1):
+                textColor = self.player.textColor
+            else:
+                if (self.player.hasLongestRoad):
+                    if (self.player.textColor == Colors.BLACK):
+                        textColor = Colors.RED_1
+                    else:
+                        textColor = Colors.RED_2
+                else:
+                    textColor = self.player.textColor
+                    
+            label = Text.SCORE_FONT.render(text[i], True, textColor)
             labelPos = label.get_rect()
             labelPos.centery = y + (i + 1) * dy
             labelPos.left = x + 0.55 * width
