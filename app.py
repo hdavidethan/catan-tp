@@ -129,7 +129,7 @@ class CatanGame(PygameGame):
     def initDevCardElements(self):
         devCards = ['knight', 'yearOfPlenty', 'monopoly', 'roadBuilding']
         for devCard in devCards:
-            devCardButton = Button(windowConfig.DEVCARD_CHOICE[devCard], windowConfig.DEVCARD_CHOICE_SIZE, '*', Colors.BUTTON_COLORS, ('confirmDevCard', devCard), 0.4, font=Text.DISCARD_FONT)
+            devCardButton = Button(windowConfig.DEVCARD_CHOICE[devCard], windowConfig.DEVCARD_CHOICE_SIZE, '*', Colors.BUTTON_COLORS, ('confirmDevCard', (devCard, self.board.players[self.currentPlayer])), 0.4, font=Text.DISCARD_FONT)
             self.devCardElements[devCard] = devCardButton
 
     # Starts the turn during the Set-up Phase
@@ -424,6 +424,7 @@ class CatanGame(PygameGame):
 
     # Starts the Robber Mode and checks possible robber positions.
     def robberMode(self):
+        self.devCardMode = False
         self.inRobberMode = True
         self.selectElements = set()
         for i in range(self.board.q):
@@ -447,7 +448,6 @@ class CatanGame(PygameGame):
 
     # Handles Steal Mode. Gives choice for steal when more than 1 is possible.
     def stealChoice(self, stealInput):
-        self.inRobberMode = False
         self.stealMode = True
         self.checkEndTurnConditions(self.board.players[self.currentPlayer])
         tile, player = stealInput
@@ -546,6 +546,12 @@ class CatanGame(PygameGame):
                 y1 = y0 + height
                 if (mx > x0 and mx < x1 and my > y0 and my < y1):
                     self.stealElements[key].onClick(self)
+            for key in self.devCardElements:
+                x0, y0, width, height = self.devCardElements[key].getRectArgs()
+                x1 = x0 + width
+                y1 = y0 + height
+                if (mx > x0 and mx < x1 and my > y0 and my < y1):
+                    self.devCardElements[key].onClick(self)
 
     # Redraws everything on the surface
     def redrawAll(self, screen):

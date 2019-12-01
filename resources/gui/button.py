@@ -64,6 +64,7 @@ class Button(Element):
                     player = game.board.players[game.currentPlayer]
                     game.discardResource(player, self.binding[1])
                 elif (self.binding[0] == 'placeRobber'):
+                    self.inRobberMode = False
                     tile = self.binding[1][0]
                     oldR, oldQ = game.oldRobberPos
                     game.board.hexBoard[oldR][oldQ].hasRobber = False
@@ -79,6 +80,9 @@ class Button(Element):
                     game.checkEndTurnConditions(currentPlayer)
                 elif (self.binding[0] == 'devCard'):
                     game.startDevCard()
+                elif (self.binding[0] == 'confirmDevCard'):
+                    print(1)
+                    Button.devCardHandler(game, self.binding)
                 elif (self.binding[0] == 'quit'):
                     game._running = False
     
@@ -126,3 +130,12 @@ class Button(Element):
         game.checkBuildConditions(player)
         player.longestRoad = player.countRoads(game)
         game.checkVictoryPoints()
+
+    @staticmethod
+    def devCardHandler(game, binding):
+        print(1)
+        devCard, player = binding[1]
+        if (devCard == 'knight'):
+            game.robberMode()
+            player.devCards['knight'] -= 1
+            player.largestArmy += 1
