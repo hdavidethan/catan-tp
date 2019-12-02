@@ -303,7 +303,6 @@ class CatanGame(PygameGame):
 
     # Removes one of the given resource from the player and update information
     def discardResource(self, player, resource):
-        print(player)
         player.resources[resource] -= 1
         self.checkDiscardConditions(player)
         self.checkEndTurnConditions(player)

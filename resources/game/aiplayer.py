@@ -39,15 +39,19 @@ class AIPlayer(Player):
             for roadID in roadIDs:
                 roads.append(game.board.edges[roadID])
             self.doRoadMove(game, roads)
+        
+        elif (move == 'buildCity'):
+            if (len(validSet) > 1):
+                self.doCityMove(game, validSet)
 
         elif (move == 'buildSettlement'):
             if (len(validSet) > 1):
-                self.doSettlementMode(game, validSet)
+                self.doSettlementMove(game, validSet)
 
         elif (move == 'buildRoad'):
             if (len(validSet) > 1):
                 self.doRoadMove(game, validSet)
-
+        
     def doRoadMove(self, game, roads):
         nextRoad = None
         found = False
@@ -78,11 +82,15 @@ class AIPlayer(Player):
         nextSettlement = None
         maxValue = -1
         for settlement in settlements:
-            value = settlement.getNodeValue(game.board)
+            value = settlement.getNodeValue(game.board)[0]
             if (value > maxValue or maxValue == -1):
                 nextSettlement = settlement
                 maxValue = value
         Button.buildModeHandler(game, ('buildConfirm', (nextSettlement, self)))
+
+    def doCityMove(self, game, cities):
+        nextCity = random.choice(list(cities))
+        Button.buildModeHandler(game, ('buildConfirm', (nextCity, self)))
 
     def getLegalMoves(self, game):
         # Check if setup
@@ -97,6 +105,9 @@ class AIPlayer(Player):
         if (settlement[1]):
             validSettlements = self.getLegalSettlements(game)
             moves.append(('buildSettlement', validSettlements))
+        if (city[1]):
+            validCities = self.getLegalCities(game)
+            moves.append(('buildCity', validCities))
         return moves
 
     def getLegalRoads(self, game):
@@ -124,6 +135,13 @@ class AIPlayer(Player):
         for node in game.board.nodes:
             validNode = node.checkOwnedRoads(game.board, self)
             if (node.nodeLevel == 0 and node.buildable and validNode):
+                seen.add(node)
+        return seen
+    
+    def getLegalCities(self, game):
+        seen = set()
+        for node in game.board.nodes:
+            if (node.nodeLevel == 1 and node.owner.index == self.index):
                 seen.add(node)
         return seen
 
