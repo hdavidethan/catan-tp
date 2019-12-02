@@ -52,18 +52,22 @@ class Button(Element):
                     else:
                         game.setActiveMode(self.binding[1])
                 elif (self.binding[0] == 'endTurn'):
-                    if (not game.discardMode):
-                        game.endTurn()
-                    else:
+                    if (game.discardMode):
                         game.endDiscard()
+                    elif (game.yearOfPlentyMode):
+                        game.endYearOfPlenty()
+                    else:
+                        game.endTurn()
                 elif (self.binding[0] == 'build'):
                     game.buildMode(self.binding[1])
                 elif (self.binding[0] == 'buildConfirm'):
                     Button.buildModeHandler(game, self.binding)
                 elif (self.binding[0] == 'discard'):
                     Button.discardHandler(game, self.binding)
+                elif (self.binding[0] == 'claim'):
+                    Button.claimHandler(game, self.binding)
                 elif (self.binding[0] == 'placeRobber'):
-                    self.inRobberMode = False
+                    game.inRobberMode = False
                     tile = self.binding[1][0]
                     oldR, oldQ = game.oldRobberPos
                     game.board.hexBoard[oldR][oldQ].hasRobber = False
@@ -131,13 +135,22 @@ class Button(Element):
 
     @staticmethod
     def devCardHandler(game, binding):
+        game.devCardMode = False
         devCard, player = binding[1]
         if (devCard == 'knight'):
             game.robberMode()
             player.devCards['knight'] -= 1
             player.largestArmy += 1
+        elif (devCard == 'yearOfPlenty'):
+            game.startYearOfPlenty()
+            player.devCards['yearOfPlenty'] -= 1
     
     @staticmethod
     def discardHandler(game, binding):
         player = game.board.players[game.currentPlayer]
         game.discardResource(player, binding[1])
+    
+    @staticmethod
+    def claimHandler(game, binding):
+        player = game.board.players[game.currentPlayer]
+        game.claimResource(player, binding[1])

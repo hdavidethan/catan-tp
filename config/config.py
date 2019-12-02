@@ -37,6 +37,8 @@ class windowConfig(object):
     CURRENT_PLAYER = (0.98 * WIDTH, 0.705 * HEIGHT)
     END_TURN = (0.9 * WIDTH, 0.76 * HEIGHT)
     END_TURN_SIZE = (0.18 * WIDTH, 0.05 * HEIGHT)
+
+    ROBBER_SCALE = 0.25
     
     DICE_1 = (0.84 * WIDTH, 0.25 * HEIGHT)
     DICE_2 = (0.9 * WIDTH, 0.25 * HEIGHT)
@@ -74,10 +76,10 @@ class windowConfig(object):
     DEVCARD_CHOICE_SIZE = (0.04 * sizeFactor, 0.04 * sizeFactor)
 
     STEAL = dict()
-    STEAL[0] = (0.25 * WIDTH, 0.82 * HEIGHT)
-    STEAL[1] = (0.25 * WIDTH, 0.18 * HEIGHT)
-    STEAL[2] = (0.75 * WIDTH, 0.18 * HEIGHT)
-    STEAL[3] = (0.75 * WIDTH, 0.82 * HEIGHT)
+    STEAL[0] = (0.27 * WIDTH, 0.82 * HEIGHT)
+    STEAL[1] = (0.27 * WIDTH, 0.18 * HEIGHT)
+    STEAL[2] = (0.72 * WIDTH, 0.18 * HEIGHT)
+    STEAL[3] = (0.72 * WIDTH, 0.82 * HEIGHT)
     STEAL_SIZE = (0.08 * WIDTH, 0.05 * HEIGHT)
 
     DISCARD_SIZE = (0.04 * sizeFactor, 0.04 * sizeFactor)

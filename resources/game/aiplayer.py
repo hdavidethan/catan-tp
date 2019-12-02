@@ -38,43 +38,31 @@ class AIPlayer(Player):
             roads = []
             for roadID in roadIDs:
                 roads.append(game.board.edges[roadID])
-            firstRoad = None
-            found = False
-            paths = copy.deepcopy(self.chooseBestRoad(game))
-            while not found:
-                if (len(paths) == 0):
-                    found = None
-                    break
-                shortestPath = min(paths, key=len)
-                firstRoad = firstNode.getRoadBetweenNodes(game.board.nodes[shortestPath[1]], game.board)
-                if (firstRoad in roads):
-                    found = True
-                else:
-                    paths.remove(shortestPath)
-            if (found == None):
-                firstRoadID = random.choice(roads)
-                firstRoad = game.board.edges[firstRoadID]
-            Button.buildModeHandler(game, ('buildConfirm', (firstRoad, self)))
+            self.doRoadMove(game, roads)
+            
         elif (move == 'buildRoad'):
             if (len(validSet) > 1):
-                nextRoad = None
-                found = False
-                paths = copy.deepcopy(self.chooseBestRoad(game))
-                while not found:
-                    if (len(paths) == 0):
-                        found = None
-                        break
-                    shortestPath = min(paths, key=len)
-                    firstNode = game.board.nodes[shortestPath[0]]
-                    nextNode = game.board.nodes[shortestPath[1]]
-                    nextRoad = firstNode.getRoadBetweenNodes(nextNode, game.board)
-                    if (nextRoad in validSet):
-                        found = True
-                    else:
-                        paths.remove(shortestPath)
-                if (nextRoad == None):
-                    nextRoad = random.choice(list(validSet))
-                Button.buildModeHandler(game, ('buildConfirm', (nextRoad, self)))
+                self.doRoadMove(game, validSet)
+
+    def doRoadMove(self, game, roads):
+        nextRoad = None
+        found = False
+        paths = copy.deepcopy(self.chooseBestRoad(game))
+        while not found:
+            if (len(paths) == 0):
+                found = None
+                break
+            shortestPath = min(paths, key=len)
+            firstNode = game.board.nodes[shortestPath[0]]
+            nextNode = game.board.nodes[shortestPath[1]]
+            nextRoad = firstNode.getRoadBetweenNodes(nextNode, game.board)
+            if (nextRoad in roads):
+                found = True
+            else:
+                paths.remove(shortestPath)
+        if (found == None):
+            nextRoad = random.choice(list(roads))
+        Button.buildModeHandler(game, ('buildConfirm', (nextRoad, self)))
 
     def getLegalMoves(self, game):
         # Check if setup
@@ -175,7 +163,6 @@ class AIPlayer(Player):
                 result.append(startRoad)
         return result
 
-    
     def chooseClosestTile(self, game):
         board = game.board
         ownedTiles = set()

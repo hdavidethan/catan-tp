@@ -15,12 +15,16 @@ class Colors(object):
     RED_1 = pygame.Color('0xe24e1b')
     RED_2 = pygame.Color('0xda7635')
     BLUE = pygame.Color('0x0097d3')
+    WHITEISH = pygame.Color('0xf5e6b3')
 
     # Menu Colors
     GOLD_1 = pygame.Color('0xfbbd08')
     GOLD_2 = pygame.Color('0xeaae00')
     GOLD_3 = pygame.Color('0xcd9903')
     GOLD_DISABLED = pygame.Color('0xf9dd86')
+
+    GOLD_1A = pygame.Color('0xfce80aeb')
+    GOLD_2A = pygame.Color('0xebd100eb')
 
     # Tile Colors
     FOREST = pygame.Color('0x415c32')
@@ -38,3 +42,4 @@ class Colors(object):
     PLAYER[3] = (pygame.Color('0x8cb369'), BLACK)
 
     BUTTON_COLORS = [GOLD_1, GOLD_2, BLACK, GOLD_DISABLED, WHITE]
+    SELECT_BUTTON_COLORS = [GOLD_1A, GOLD_2A, BLACK, GOLD_DISABLED, WHITE] #[TEAL_1, TEAL_2, BLACK, TEAL_DISABLED, WHITE]

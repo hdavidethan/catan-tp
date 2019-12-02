@@ -62,6 +62,8 @@ class CatanMath(object):
         return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 class Utils(object):
+    RESOURCES = ['lumber', 'brick', 'sheep', 'grain', 'ore']
+
     # Returns the resource name from the type of tile
     @staticmethod
     def getResourceFromType(type):
