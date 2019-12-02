@@ -214,6 +214,7 @@ class CatanGame(PygameGame):
         if (isinstance(player, AIPlayer)):
             player.startTurn(self)
         else:
+            self.checkForLongestRoad()
             self.checkBuildConditions(player)
             self.useDevCardConditions(player)
 
@@ -388,9 +389,10 @@ class CatanGame(PygameGame):
                     (len(player.roads) < len(player.settlements)))
         roadCondition = (((not self.setupMode and roadResources and 
                     settlementExists) and not self.discardMode) or setupRoads)
-        settlementCondition = (((player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
+
+        settlementResources = (player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
                             and player.resources['grain'] >= 1 and player.resources['sheep'] >= 1)
-                            or (self.setupMode and ((self.turn // 4 == 1 and len(player.settlements) == 0) or
+        settlementCondition = ((settlementResources or (self.setupMode and ((self.turn // 4 == 1 and len(player.settlements) == 0) or
                             (self.turn // 4 == 0 and len(player.settlements) == 1)))) and not self.discardMode)
         cityCondition = ((player.resources['ore'] >= 3 and player.resources['grain'] >= 2
                             and len(player.settlements) > 0) and not self.discardMode)

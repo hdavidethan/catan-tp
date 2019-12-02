@@ -131,6 +131,7 @@ class Button(Element):
         game.inBuildMode = False
         game.checkBuildConditions(player)
         player.longestRoad = player.countRoads(game)
+        game.checkForLongestRoad()
         game.checkVictoryPoints()
 
     @staticmethod

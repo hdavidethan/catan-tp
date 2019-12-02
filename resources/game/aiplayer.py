@@ -39,7 +39,11 @@ class AIPlayer(Player):
             for roadID in roadIDs:
                 roads.append(game.board.edges[roadID])
             self.doRoadMove(game, roads)
-            
+
+        elif (move == 'buildSettlement'):
+            if (len(validSet) > 1):
+                self.doSettlementMode(game, validSet)
+
         elif (move == 'buildRoad'):
             if (len(validSet) > 1):
                 self.doRoadMove(game, validSet)
@@ -53,6 +57,12 @@ class AIPlayer(Player):
                 found = None
                 break
             shortestPath = min(paths, key=len)
+            while len(shortestPath) < 2:
+                paths.remove(shortestPath)
+                if (len(paths) > 0):
+                    shortestPath = min(paths, key=len)
+                else:
+                    return
             firstNode = game.board.nodes[shortestPath[0]]
             nextNode = game.board.nodes[shortestPath[1]]
             nextRoad = firstNode.getRoadBetweenNodes(nextNode, game.board)
@@ -63,6 +73,16 @@ class AIPlayer(Player):
         if (found == None):
             nextRoad = random.choice(list(roads))
         Button.buildModeHandler(game, ('buildConfirm', (nextRoad, self)))
+    
+    def doSettlementMove(self, game, settlements):
+        nextSettlement = None
+        maxValue = -1
+        for settlement in settlements:
+            value = settlement.getNodeValue(game.board)
+            if (value > maxValue or maxValue == -1):
+                nextSettlement = settlement
+                maxValue = value
+        Button.buildModeHandler(game, ('buildConfirm', (nextSettlement, self)))
 
     def getLegalMoves(self, game):
         # Check if setup
@@ -70,13 +90,14 @@ class AIPlayer(Player):
             return [('setup', None)]
         # Check Build
         road, settlement, city, devCard = game.checkBuildConditions(self)
+        moves = []
         if (road[1]):
             validRoads = self.getLegalRoads(game)
-            return [('buildRoad', validRoads)]
+            moves.append(('buildRoad', validRoads))
         if (settlement[1]):
             validSettlements = self.getLegalSettlements(game)
-            return []
-        return []
+            moves.append(('buildSettlement', validSettlements))
+        return moves
 
     def getLegalRoads(self, game):
         seen = set()
@@ -99,7 +120,12 @@ class AIPlayer(Player):
         return seen
     
     def getLegalSettlements(self, game):
-        pass
+        seen = set()
+        for node in game.board.nodes:
+            validNode = node.checkOwnedRoads(game.board, self)
+            if (node.nodeLevel == 0 and node.buildable and validNode):
+                seen.add(node)
+        return seen
 
     def chooseBestNode(self, game):
         nodeList = []
