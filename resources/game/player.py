@@ -50,26 +50,3 @@ class Player(object):
                     length = max(length, testLength)
         return length
 
-    # TODO: Make this recursive
-    # i.e. do two halves and have each possible segment return a list of roads connected
-    def checkLongestRoad(self, player):
-        pass
-        # TODO: ALl following code is indented 1 tab to the right.
-        #     if (len(player.roads) >= 5):
-        #         mainSet = copy.copy(player.roads)
-        #         seen = set()
-        #         first = random.choice(list(mainSet))
-        #         mainSet.remove(first)
-        #         seen.add(first)
-        
-        # def recursiveLongestRoad(self, player):
-        #     if ():
-        #         pass
-        #     else:
-        #         road1, road2 = first.getRoads(self.board)
-        #         for edge in road1:
-        #             if (self.board.edges[edge] in mainSet):
-        #                 seen.add(self.board.edges[edge])
-        #         for edge in road2:
-        #             if (self.board.edges[edge] in mainSet):
-        #                 seen.add(self.board.edges[edge])

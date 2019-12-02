@@ -2,6 +2,7 @@
 # Axial File
 # Contains axial functions for the Catan Board.
 # Written by David Hwang (dchwang) for 15-112 Fall 2019 Term Project
+# Solutions based on https://www.redblobgames.com/grids/hexagons/
 #########################################################################
 
 from resources.game.node import Node
@@ -82,4 +83,21 @@ def getNodeInDirection(referencePos, direction):
         else:
             return (adj[2][0], adjNode[1])
 
+# From https://www.redblobgames.com/grids/hexagons/#distances
+def axialToCubic(r, q):
+    x = r
+    z = q
+    y = -x - z
+    return x, y, z
         
+# From https://www.redblobgames.com/grids/hexagons/#distances
+def cubeDistances(tile0, tile1):
+    x0, y0, z0 = tile0
+    x1, y1, z1 = tile1
+    return (abs(x0 - x1) + abs(y0 - y1) + abs(z0 - z1)) / 2
+
+# From https://www.redblobgames.com/grids/hexagons/#distances
+def axialDistance(r0, q0, r1, q1):
+    ac = axialToCubic(r0, q0)
+    bc = axialToCubic(r1, q1)
+    return cubeDistances(ac, bc)

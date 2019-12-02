@@ -260,6 +260,8 @@ class CatanGame(PygameGame):
         player.discardGoal = player.countCards() // 2
         self.checkDiscardConditions(player)
         self.checkEndTurnConditions(player)
+        if (isinstance(player, AIPlayer)):
+            player.startDiscard(self)
     
     def startDevCard(self):
         self.devCardMode = True
@@ -307,12 +309,15 @@ class CatanGame(PygameGame):
 
     # Checks if it is possible to discard certain resources. (i.e. is > 0)
     def checkDiscardConditions(self, player):
+        resources = ['brick', 'grain', 'ore', 'sheep', 'lumber']
         for resource in player.resources:
             count = player.resources[resource]
             if (count < 1 or (player.countCards() <= player.discardGoal)):
                 self.discardElements[resource].isDisabled = True
+                resources.remove(resource)
             else:
                 self.discardElements[resource].isDisabled = False
+        return resources
 
     
     # Checks if the turn can be ended by the current player.
@@ -322,11 +327,13 @@ class CatanGame(PygameGame):
             for element in self.elements:
                 if (element == tmpButton):
                     element.isDisabled = True
+                    return False
         else:
             tmpButton = Button(windowConfig.END_TURN, None, None, None, None)
             for element in self.elements:
                 if (element == tmpButton):
                     element.isDisabled = False
+                    return True
 
     # Checks build conditions and enables/disables the corresponding buttons
     def checkBuildConditions(self, player):
@@ -448,6 +455,7 @@ class CatanGame(PygameGame):
 
     # Handles Steal Mode. Gives choice for steal when more than 1 is possible.
     def stealChoice(self, stealInput):
+        self.inRobberMode = False
         self.stealMode = True
         self.checkEndTurnConditions(self.board.players[self.currentPlayer])
         tile, player = stealInput

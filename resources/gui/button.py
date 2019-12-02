@@ -61,8 +61,7 @@ class Button(Element):
                 elif (self.binding[0] == 'buildConfirm'):
                     Button.buildModeHandler(game, self.binding)
                 elif (self.binding[0] == 'discard'):
-                    player = game.board.players[game.currentPlayer]
-                    game.discardResource(player, self.binding[1])
+                    Button.discardHandler(game, self.binding)
                 elif (self.binding[0] == 'placeRobber'):
                     self.inRobberMode = False
                     tile = self.binding[1][0]
@@ -81,7 +80,6 @@ class Button(Element):
                 elif (self.binding[0] == 'devCard'):
                     game.startDevCard()
                 elif (self.binding[0] == 'confirmDevCard'):
-                    print(1)
                     Button.devCardHandler(game, self.binding)
                 elif (self.binding[0] == 'quit'):
                     game._running = False
@@ -133,9 +131,13 @@ class Button(Element):
 
     @staticmethod
     def devCardHandler(game, binding):
-        print(1)
         devCard, player = binding[1]
         if (devCard == 'knight'):
             game.robberMode()
             player.devCards['knight'] -= 1
             player.largestArmy += 1
+    
+    @staticmethod
+    def discardHandler(game, binding):
+        player = game.board.players[game.currentPlayer]
+        game.discardResource(player, binding[1])
