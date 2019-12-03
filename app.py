@@ -224,7 +224,7 @@ class CatanGame(PygameGame):
         if (not self.setupMode):
             victory = self.checkVictory()
             if (victory != None):
-                print(victory.index, 'wins!')
+                print(victory.index, f'wins at turn {self.turn}!')
                 self.setActiveMode('menu')
             else:    
                 self.turn += 1

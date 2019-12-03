@@ -32,7 +32,7 @@ class AIPlayer(Player):
             if (self.reachedPriorityNode(game)):
                 tmpDict = copy.deepcopy(moveDict)
                 for key in tmpDict:
-                    if (key != 'buildSettlement'):
+                    if (key not in ['buildSettlement', 'buildCity']):
                         del moveDict[key]
             if ('buildSettlement' in actions and moveDict['buildSettlement'][1] != set()):
                 nextMove = moveDict['buildSettlement']
