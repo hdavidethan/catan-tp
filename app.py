@@ -123,6 +123,7 @@ class CatanGame(PygameGame):
                                 'X', Colors.BUTTON_COLORS, ('discard', resource), 0.4, font=Text.DISCARD_FONT)
             self.discardElements[resource] = discardButton
 
+    # Initializes year of plenty buttons
     def initYearOfPlentyElements(self):
         resources = Utils.RESOURCES
         for resource in resources:
@@ -279,6 +280,7 @@ class CatanGame(PygameGame):
         if (isinstance(player, AIPlayer)):
             player.startDiscard(self)
     
+    # Starts the year of plenty claim round
     def startYearOfPlenty(self):
         self.yearOfPlentyMode = True
         player = self.board.players[self.currentPlayer]
@@ -479,10 +481,12 @@ class CatanGame(PygameGame):
 
     # Starts the Robber Mode and checks possible robber positions.
     def robberMode(self):
+        player = self.board.players[self.currentPlayer]
         self.devCardMode = False
         self.inRobberMode = True
-        self.checkEndTurnConditions(self.board.players[self.currentPlayer])
+        self.checkEndTurnConditions(player)
         self.selectElements = set()
+        aiSet = set()
         for i in range(self.board.q):
             row = copy.copy(self.board.hexBoard[i])
             colCtr = 0
@@ -493,22 +497,28 @@ class CatanGame(PygameGame):
             for j in range(rowLen): 
                 tile = self.board.hexBoard[i][j+firstIndex]
                 if (not tile.hasRobber):
-                    x0, y0, x1, y1 = tile.bounds
-                    hexHeight = y1 - y0
-                    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-                    tileButton = Button((cx, cy + 0.25 * hexHeight), windowConfig.SELECT_BUTTON_SIZE,
-                        None, Colors.SELECT_BUTTON_COLORS, ('placeRobber', (tile, self.board.players[self.currentPlayer])), 0.4)
-                    self.selectElements.add(tileButton)
+                    if (not isinstance(player, AIPlayer)):
+                        x0, y0, x1, y1 = tile.bounds
+                        hexHeight = y1 - y0
+                        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+                        tileButton = Button((cx, cy + 0.25 * hexHeight), windowConfig.SELECT_BUTTON_SIZE,
+                            None, Colors.SELECT_BUTTON_COLORS, ('placeRobber', (tile, player)), 0.4)
+                        self.selectElements.add(tileButton)
+                    else:
+                        aiSet.add(tile)
                 else:
                     self.oldRobberPos = (i, j+firstIndex)
+        if (isinstance(player, AIPlayer)):
+            player.robberMode(self, aiSet)
+            print(self.oldRobberPos)
 
     # Handles Steal Mode. Gives choice for steal when more than 1 is possible.
     def stealChoice(self, stealInput):
+        tile, player = stealInput
         self.inRobberMode = False
         self.selectElements = set()
         self.stealMode = True
-        self.checkEndTurnConditions(self.board.players[self.currentPlayer])
-        tile, player = stealInput
+        self.checkEndTurnConditions(player)
         victims = set()
         for node in tile.nodes:
             nodeID = node.id
@@ -516,14 +526,17 @@ class CatanGame(PygameGame):
             if (owner != None and owner != player and owner.countCards() > 0):
                 victims.add(owner.index)
         if (len(victims) > 0):
-            for key in self.stealElements:
-                if (key in victims):
-                    self.stealElements[key].isDisabled = False
-                else:
-                    self.stealElements[key].isDisabled = True
+            if (isinstance(player, AIPlayer)):
+                player.stealChoice(self, victims)
+            else:
+                for key in self.stealElements:
+                    if (key in victims):
+                        self.stealElements[key].isDisabled = False
+                    else:
+                        self.stealElements[key].isDisabled = True
         else:
             self.stealMode = False
-            self.checkEndTurnConditions(self.board.players[self.currentPlayer])
+            self.checkEndTurnConditions(player)
     
     # Checks which player has the longest road
     def checkForLongestRoad(self):

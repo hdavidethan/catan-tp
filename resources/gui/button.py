@@ -67,20 +67,9 @@ class Button(Element):
                 elif (self.binding[0] == 'claim'):
                     Button.claimHandler(game, self.binding)
                 elif (self.binding[0] == 'placeRobber'):
-                    game.inRobberMode = False
-                    tile = self.binding[1][0]
-                    oldR, oldQ = game.oldRobberPos
-                    game.board.hexBoard[oldR][oldQ].hasRobber = False
-                    tile.hasRobber = True
-                    game.stealChoice(self.binding[1])
+                    Button.robberHandler(game, self.binding)
                 elif (self.binding[0] == 'stealConfirm'):
-                    currentPlayer = game.board.players[game.currentPlayer]
-                    victim = self.binding[1]
-                    resource = Utils.stealRandomResource(victim)
-                    victim.resources[resource] -= 1
-                    currentPlayer.resources[resource] += 1
-                    game.stealMode = False
-                    game.checkEndTurnConditions(currentPlayer)
+                    Button.stealHandler(game, self.binding)
                 elif (self.binding[0] == 'devCard'):
                     game.startDevCard()
                 elif (self.binding[0] == 'confirmDevCard'):
@@ -155,3 +144,22 @@ class Button(Element):
     def claimHandler(game, binding):
         player = game.board.players[game.currentPlayer]
         game.claimResource(player, binding[1])
+    
+    @staticmethod
+    def robberHandler(game, binding):
+        game.inRobberMode = False
+        tile = binding[1][0]
+        oldR, oldQ = game.oldRobberPos
+        game.board.hexBoard[oldR][oldQ].hasRobber = False
+        tile.hasRobber = True
+        game.stealChoice(binding[1])
+    
+    @staticmethod
+    def stealHandler(game, binding):
+        currentPlayer = game.board.players[game.currentPlayer]
+        victim = binding[1]
+        resource = Utils.stealRandomResource(victim)
+        victim.resources[resource] -= 1
+        currentPlayer.resources[resource] += 1
+        game.stealMode = False
+        game.checkEndTurnConditions(currentPlayer)

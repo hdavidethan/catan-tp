@@ -18,3 +18,9 @@ class Tile(object):
         r = self.pos[0]
         q = self.pos[1]
         return f'<{self.type} Tile [{self.number}] at ({r}, {q})>'
+    
+    def __eq__(self, other):
+        return isinstance(other, Tile) and self.pos == other.pos
+    
+    def __hash__(self):
+        return hash((self.pos,))

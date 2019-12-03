@@ -62,6 +62,41 @@ class AIPlayer(Player):
             nextDiscard = random.choice(resources)
             Button.discardHandler(game, ('discard', nextDiscard))
 
+    def robberMode(self, game, tileSet):
+        board = game.board
+        tileValues = dict()
+        for i in range(board.q):
+            row = copy.copy(board.hexBoard[i])
+            colCtr = 0
+            while None in row:
+                row.remove(None)
+            firstIndex = board.hexBoard[i].index(row[0])
+            rowLen = len(row)
+            for j in range(rowLen): 
+                tile = board.hexBoard[i][j+firstIndex]
+                r, q = i, j + firstIndex
+                value = 0
+                for node in tile.nodes:
+                    if (node.owner != None and node.owner != self):
+                        value += 1
+                    elif (node.owner == self):
+                        value -= 1
+                tileValues[(i,j)] = value
+        for r, q in tileValues:
+            if (Tile(r, q) not in tileSet):
+                tileValues[(r, q)] = -float('inf')
+        values = list(tileValues.values())
+        keys = list(tileValues.keys())
+        maxTile = keys[values.index(max(values))]
+        for tile in tileSet:
+            if (tile.pos == maxTile):
+                Button.robberHandler(game, ('placeRobber', (tile, self)))
+                break
+    
+    def stealChoice(self, game, victimSet):
+        choice = game.board.players[random.choice(list(victimSet))]
+        Button.stealHandler(game, ('stealConfirm', choice))
+
     # Does the given move
     def doMove(self, game, listOfMoves):
         self.getBestNodeList(game)
