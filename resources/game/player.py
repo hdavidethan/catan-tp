@@ -49,4 +49,12 @@ class Player(object):
                     testLength = self.checkRoads(branchID, game, newChecked)
                     length = max(length, testLength)
         return length
+    
+    def getOwnedNodes(self):
+        total = set()
+        for node in self.settlements:
+            total.add(node)
+        for node in self.cities:
+            total.add(node)
+        return total
 

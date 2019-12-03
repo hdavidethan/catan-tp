@@ -63,6 +63,7 @@ class CatanMath(object):
 
 class Utils(object):
     RESOURCES = ['lumber', 'brick', 'sheep', 'grain', 'ore']
+    VICTORY_POINT_THRESHOLD = 5
 
     # Returns the resource name from the type of tile
     @staticmethod

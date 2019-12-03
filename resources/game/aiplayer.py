@@ -14,21 +14,57 @@ from resources.game.axial import *
 class AIPlayer(Player):
     def __init__(self, index):
         super().__init__(index)
+        self.priorityNode = None
         print(f'Initialized AI Player {self.index}')
 
+    # Starts the turn for AI Players (analogous to startTurn() in app.py)
     def startTurn(self, game):
+        print('Starting Turn of Player' + f'{self.index}' + f' {self.priorityNode}')
         moves = self.getLegalMoves(game)
         if (len(moves) > 0):
-            nextMove = random.choice(moves)
+            actions = []
+            moveDict = dict()
+            nextMove = [None, set()]
+            for move in moves:
+                action, moveSet = move
+                actions.append(action)
+                moveDict[action] = move
+            if (self.reachedPriorityNode(game)):
+                tmpDict = copy.deepcopy(moveDict)
+                for key in tmpDict:
+                    if (key != 'buildSettlement'):
+                        del moveDict[key]
+            if ('buildSettlement' in actions and moveDict['buildSettlement'][1] != set()):
+                nextMove = moveDict['buildSettlement']
+                print('Build Settlement', nextMove)
+            elif (len(moveDict.keys()) > 0):
+                actions = []
+                for key in moveDict:
+                    actions.append(key)
+                nextAction = random.choice(actions)
+                nextMove = moveDict[nextAction]
             self.doMove(game, nextMove)
     
+    # Checks if the AI Player has a road connected to the priority node.
+    def reachedPriorityNode(self, game):
+        if (not game.setupMode):
+            priorityNode = game.board.nodes[self.priorityNode]
+            roadIDs = priorityNode.getRoads(game.board)
+            roads = {game.board.edges[roadID] for roadID in roadIDs}
+            roadOwners = [road.road for road in roads]
+            return self.bgColor in roadOwners
+        return False
+
+    # Starts the Discard Phase for AI Players (analogous to startDiscard() in app.py)
     def startDiscard(self, game):
         while not game.checkEndTurnConditions(self):
             resources = game.checkDiscardConditions(self)
             nextDiscard = random.choice(resources)
             Button.discardHandler(game, ('discard', nextDiscard))
 
+    # Does the given move
     def doMove(self, game, listOfMoves):
+        self.getBestNodeList(game)
         move, validSet = listOfMoves
         if (move == 'setup'):
             nodeIndex = self.chooseBestNode(game)
@@ -41,17 +77,18 @@ class AIPlayer(Player):
             self.doRoadMove(game, roads)
         
         elif (move == 'buildCity'):
-            if (len(validSet) > 1):
+            if (len(validSet) >= 1):
                 self.doCityMove(game, validSet)
 
         elif (move == 'buildSettlement'):
-            if (len(validSet) > 1):
+            if (len(validSet) >= 1):
                 self.doSettlementMove(game, validSet)
 
         elif (move == 'buildRoad'):
-            if (len(validSet) > 1):
+            if (len(validSet) >= 1):
                 self.doRoadMove(game, validSet)
-        
+    
+    # Performs the move if the move is a road move.
     def doRoadMove(self, game, roads):
         nextRoad = None
         found = False
@@ -78,6 +115,7 @@ class AIPlayer(Player):
             nextRoad = random.choice(list(roads))
         Button.buildModeHandler(game, ('buildConfirm', (nextRoad, self)))
     
+    # Performs the move if the move is a settlement move.
     def doSettlementMove(self, game, settlements):
         nextSettlement = None
         maxValue = -1
@@ -88,28 +126,33 @@ class AIPlayer(Player):
                 maxValue = value
         Button.buildModeHandler(game, ('buildConfirm', (nextSettlement, self)))
 
+    # Performs the move if the move is a city move.
     def doCityMove(self, game, cities):
         nextCity = random.choice(list(cities))
         Button.buildModeHandler(game, ('buildConfirm', (nextCity, self)))
 
+    # Returns the legal moves for the player
     def getLegalMoves(self, game):
         # Check if setup
         if (game.setupMode):
             return [('setup', None)]
         # Check Build
-        road, settlement, city, devCard = game.checkBuildConditions(self)
-        moves = []
-        if (road[1]):
-            validRoads = self.getLegalRoads(game)
-            moves.append(('buildRoad', validRoads))
-        if (settlement[1]):
-            validSettlements = self.getLegalSettlements(game)
-            moves.append(('buildSettlement', validSettlements))
-        if (city[1]):
-            validCities = self.getLegalCities(game)
-            moves.append(('buildCity', validCities))
-        return moves
+        else:
+            self.setPriorityNode(game)
+            road, settlement, city, devCard = game.checkBuildConditions(self)
+            moves = []
+            if (road[1]):
+                validRoads = self.getLegalRoads(game)
+                moves.append(('buildRoad', validRoads))
+            if (settlement[1]):
+                validSettlements = self.getLegalSettlements(game)
+                moves.append(('buildSettlement', validSettlements))
+            if (city[1]):
+                validCities = self.getLegalCities(game)
+                moves.append(('buildCity', validCities))
+            return moves
 
+    # Returns the legal roads to build
     def getLegalRoads(self, game):
         seen = set()
         for node in game.board.nodes:
@@ -130,6 +173,7 @@ class AIPlayer(Player):
                         seen.add(game.board.edges[i])
         return seen
     
+    # Returns the legal settlements to build
     def getLegalSettlements(self, game):
         seen = set()
         for node in game.board.nodes:
@@ -138,6 +182,7 @@ class AIPlayer(Player):
                 seen.add(node)
         return seen
     
+    # Returns the legal cities to build
     def getLegalCities(self, game):
         seen = set()
         for node in game.board.nodes:
@@ -145,6 +190,7 @@ class AIPlayer(Player):
                 seen.add(node)
         return seen
 
+    # Chooses the node with highest value.
     def chooseBestNode(self, game):
         nodeList = []
         for node in game.board.nodes:
@@ -163,27 +209,76 @@ class AIPlayer(Player):
                 maxValue = value
                 maxIndex = i
         return maxIndex
+
+    # Sets the priority node for AI Players
+    def setPriorityNode(self, game):
+        print(1)
+        if (self.priorityNode == None):
+            nodeList = self.getBestNodeList(game)
+            validNodes = []
+            for nodeTuple in nodeList:
+                value, numList, nodeID = nodeTuple
+                node = game.board.nodes[nodeID]
+                bestDistance = -1
+                bestStart = None
+                for ownedNodeID in self.getOwnedNodes():
+                    ownedNode = game.board.nodes[ownedNodeID]
+                    path, distance = self.dijkstraRoads(game, ownedNode, node)
+                    if (distance < bestDistance or bestDistance == -1):
+                        bestDistance = distance
+                        bestStart = ownedNode
+                if (bestDistance < 4 and node.buildable):
+                    validNodes.append(node.id)
+            self.priorityNode = random.choice(validNodes)
+        elif (not game.board.nodes[self.priorityNode].buildable or game.board.nodes[self.priorityNode].owner != None):
+            self.priorityNode = None
+            self.setPriorityNode(game)
+        else:
+            print(game.board.nodes[self.priorityNode].buildable)
     
+    # Returns a list of best nodes in descending order
+    def getBestNodeList(self, game):
+        nodeList = []
+        for node in game.board.nodes:
+            if (node.owner == None and node.buildable):
+                value, numList = node.getNodeValue(game.board)
+                nodeList.append((value, numList, node.id))
+            else:
+                nodeList.append((0, [], node.id))
+        nodeList.sort(reverse=True)
+        return nodeList
+
+    # Chooses the best possible road given the shortest path
     def chooseBestRoad(self, game):
-        tileOrder = self.chooseClosestTile(game)
+        if (game.setupMode):
+            destination = game.board.nodes[self.chooseBestNode(game)]
+        else:
+            destination = game.board.nodes[self.priorityNode]
+        tileOrder = self.chooseClosestTile(game, destination)
         minimumDistance = -1
         minimumTile = None
-        destination = game.board.nodes[self.chooseBestNode(game)]
         paths = []
         for tile in tileOrder:
             for node in tile.nodes:
-                if (node.owner == self):
-                    nodeOrder = self.dijkstraRoads(game, node, destination)
+                roadIDs = node.getRoads(game.board)
+                roads = {game.board.edges[roadID] for roadID in roadIDs}
+                roadOwners = [road.road for road in roads]
+                noOwnerCondition = node.owner == None and (None in roadOwners and self.bgColor in roadOwners)
+                if (node.owner == self or noOwnerCondition):
+                    nodeOrder = self.dijkstraRoads(game, node, destination)[0]
+                    print(self.index, nodeOrder)
                     paths.append(nodeOrder)
         return paths
-    
+
+    # Wrapper function for shortest path (recursiveDijkstra)
     def dijkstraRoads(self, game, start, dest):
         inf = float('inf')
         distances = {node.id: inf for node in game.board.nodes}
         distances[start.id] = 0
         bestDistance, bestPath = self.recursiveDijkstra(game, start, dest, distances, [start.id])
-        return bestPath
+        return bestPath, bestDistance
 
+    # Recursive function to get shortest path
     def recursiveDijkstra(self, game, start, dest, distances, path):
         adjacentNodes = start.getAdjacentNodes(game.board)
         bestDistance = distances[dest.id]
@@ -199,6 +294,7 @@ class AIPlayer(Player):
                         bestPath = tmpPath
         return bestDistance, bestPath
 
+    # Chooses the ideal source road to build from.
     def chooseSourceRoad(self, game, node):
         result = []
         startRoads = node.getRoads(game.board)
@@ -207,7 +303,8 @@ class AIPlayer(Player):
                 result.append(startRoad)
         return result
 
-    def chooseClosestTile(self, game):
+    # Chooses the closest tile to a given node
+    def chooseClosestTile(self, game, node):
         board = game.board
         ownedTiles = set()
         for i in range(board.q):
@@ -226,14 +323,14 @@ class AIPlayer(Player):
             result = []
             tmp = copy.copy(list(ownedTiles))
             while len(tmp) > 0:
-                minTile = self.findMinimumDistance(game, tmp)
+                minTile = self.findMinimumDistance(game, tmp, node)
                 tmp.remove(minTile)
                 result.append(minTile)
         return result
     
-    def findMinimumDistance(self, game, tiles):
-        bestNode = game.board.nodes[self.chooseBestNode(game)]
-        possibleTiles = self.findTilesFromNode(game, bestNode)
+    # Find the minimum distance to a given tile from another tile
+    def findMinimumDistance(self, game, tiles, node):
+        possibleTiles = self.findTilesFromNode(game, node)
         minDistance = -1
         minTile = None
         for tile in possibleTiles:
@@ -245,7 +342,8 @@ class AIPlayer(Player):
                     minDistance = distance
                     minTile = ownedTile
         return minTile
-        
+    
+    # Find the tiles surrounding a node
     def findTilesFromNode(self, game, node):
         board = game.board
         found = set()

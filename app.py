@@ -235,7 +235,7 @@ class CatanGame(PygameGame):
     # Checks if any player has achieved 10 victory points. Returns the player.
     def checkVictory(self):
         for player in self.board.players:
-            if (player.victoryPoints + player.devCards['victoryPoint'] >= 10):
+            if (player.victoryPoints + player.devCards['victoryPoint'] >= Utils.VICTORY_POINT_THRESHOLD):
                 return player
     
     # Collects resources for all players given current roll
@@ -400,7 +400,10 @@ class CatanGame(PygameGame):
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))
         for build in conditions:
-            self.buildElements[build[0]].isDisabled = not build[1]
+            if (isinstance(player, AIPlayer)):
+                self.buildElements[build[0]].isDisabled = True
+            else:
+                self.buildElements[build[0]].isDisabled = build[1]
         return conditions
     
     # Handles the Build Mode logic
