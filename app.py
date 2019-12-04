@@ -42,6 +42,9 @@ class CatanGame(PygameGame):
         self.humanCount = 2
         self.aiCount = 2
         self.imageCache = dict()
+        pygame.mixer.music.load('resources/assets/audio/catan.ogg')
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0.7)
         self.setActiveMode('menu')
     
     # Loads an image into an image cache and returns the cached image
