@@ -13,7 +13,7 @@ sizeFactor = int(min(windowConfig.WIDTH, windowConfig.HEIGHT) / 600)
 class Text(object):
     TOKEN_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 24*sizeFactor)
     PORT_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 16*sizeFactor)
-    NODE_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 16*sizeFactor)
+    NODE_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 18*sizeFactor)
     SCORE_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 20*sizeFactor)
     CURRENT_PLAYER_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 20*sizeFactor)
     BUTTON_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 22*sizeFactor)

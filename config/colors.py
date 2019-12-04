@@ -16,6 +16,7 @@ class Colors(object):
     RED_2 = pygame.Color('0xda7635')
     BLUE = pygame.Color('0x0097d3')
     WHITEISH = pygame.Color('0xf5e6b3')
+    GRAY = pygame.Color('0xbab5bc')
 
     # Menu Colors
     GOLD_1 = pygame.Color('0xfbbd08')
@@ -36,10 +37,10 @@ class Colors(object):
 
     # Player Colors
     PLAYER = dict()
-    PLAYER[0] = (pygame.Color('0xff9b42'), BLACK)
+    PLAYER[0] = (pygame.Color('0xbf6900'), WHITE)
     PLAYER[1] = (pygame.Color('0x92140c'), WHITE)
     PLAYER[2] = (pygame.Color('0x002642'), WHITE)
-    PLAYER[3] = (pygame.Color('0x8cb369'), BLACK)
+    PLAYER[3] = (pygame.Color('0x42703d'), WHITE)
 
     BUTTON_COLORS = [GOLD_1, GOLD_2, BLACK, GOLD_DISABLED, WHITE]
     SELECT_BUTTON_COLORS = [GOLD_1A, GOLD_2A, BLACK, GOLD_DISABLED, WHITE] #[TEAL_1, TEAL_2, BLACK, TEAL_DISABLED, WHITE]

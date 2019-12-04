@@ -41,12 +41,19 @@ class CatanGame(PygameGame):
         self.victoryMode = False
         self.humanCount = 2
         self.aiCount = 2
+        self.fogOfWar = True
         self.imageCache = dict()
+        self.soundCache = dict()
+        self.initAudio()
+        self.setActiveMode('menu')
+    
+    def initAudio(self):
         pygame.mixer.music.load('resources/assets/audio/catan.ogg')
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.7)
-        self.setActiveMode('menu')
-    
+        self.musicPaused = False
+        self.soundCache['buttonClick'] = pygame.mixer.Sound('resources/assets/audio/button.ogg')
+
     # Loads an image into an image cache and returns the cached image
     def loadImageFromCache(self, path):
         if path not in self.imageCache:
@@ -57,6 +64,7 @@ class CatanGame(PygameGame):
     # Resets all game variables (Board, Player, etc.)
     def resetGame(self, human, ai):
         self.inBuildMode = False
+        self.fogOfWar = True if human > 0 else False
         self.discardMode = False
         self.inRobberMode = False
         self.stealMode = False
@@ -269,7 +277,6 @@ class CatanGame(PygameGame):
             self.collectResources()
         turn = self.currentPlayer
         player = self.board.players[turn]
-        print(player)
         if (isinstance(player, AIPlayer)):
             player.startTurn(self)
         else:
@@ -298,7 +305,6 @@ class CatanGame(PygameGame):
         if (not self.setupMode):
             victory = self.checkVictory()
             if (victory != None):
-                print(victory.index, f'wins at turn {self.turn}!')
                 self.victoryMode = True
             else:    
                 self.turn += 1
@@ -485,7 +491,6 @@ class CatanGame(PygameGame):
                     self.oldRobberPos = (i, j+firstIndex)
         if (isinstance(player, AIPlayer)):
             player.robberMode(self, aiSet)
-            print(self.oldRobberPos)
 
     # Handles Steal Mode. Gives choice for steal when more than 1 is possible.
     def stealChoice(self, stealInput):
@@ -696,6 +701,15 @@ class CatanGame(PygameGame):
 
     # Handles keystrokes
     def keyPressed(self, key, mod):
+        # Global Key Bindings
+        if (key == pygame.K_F1):
+            if (not self.musicPaused):
+                pygame.mixer.music.pause()
+                self.musicPaused = True
+            else:
+                pygame.mixer.music.unpause()
+                self.musicPaused = False
+        # Game Mode specific Key Bindings
         if (self.activeMode == 'game'):
             if (key == pygame.K_m):
                 self.setActiveMode('menu')
@@ -723,6 +737,10 @@ class CatanGame(PygameGame):
                 self.isPaused = not self.isPaused
             elif (key == pygame.K_y):
                 self.board.players[self.currentPlayer].devCards['yearOfPlenty'] += 1
+            elif (key == pygame.K_k):
+                self.board.players[self.currentPlayer].devCards['knight'] += 1
+            elif (key == pygame.K_F7):
+                self.fogOfWar = not self.fogOfWar
 
     # Handles mouse presses
     def mousePressed(self, mx, my):
@@ -905,7 +923,7 @@ class CatanGame(PygameGame):
         width, height = windowConfig.RESOURCES_SIZE
         pygame.draw.rect(screen, Colors.WHITE, (x, y, width, height))
         pygame.draw.rect(screen, Colors.BLACK, (x, y, width, height), 1)
-        if (not isinstance(player, AIPlayer)):
+        if (not isinstance(player, AIPlayer) or not self.fogOfWar):
             resources = player.resources
         else:
             resources = {'lumber':'??', 'brick':'??', 'sheep':'??', 'grain':'??', 'ore':'??'}
@@ -922,7 +940,7 @@ class CatanGame(PygameGame):
         width, height = windowConfig.DEVCARDS_SIZE
         pygame.draw.rect(screen, Colors.WHITE, (x, y, width, height))
         pygame.draw.rect(screen, Colors.BLACK, (x, y, width, height), 1)
-        if (not isinstance(player, AIPlayer)):
+        if (not isinstance(player, AIPlayer) or not self.fogOfWar):
             devCards = player.devCards
         else:
             devCards = {'knight':'??', 'yearOfPlenty':'??', 'monopoly':'??', 'roadBuilding':'??'}
@@ -998,7 +1016,7 @@ class CatanGame(PygameGame):
                 point1 = hexPoints[edgeIndex]
                 point2 = hexPoints[(edgeIndex+1)%6]
                 roadOwner = roadEdge.road
-                roadArgs = CatanMath.getThickAALine(point1, point2)
+                roadArgs = CatanMath.getThickAALine(point1, point2, 5)
                 gfxdraw.filled_polygon(screen, roadArgs, roadOwner)
                 gfxdraw.aapolygon(screen, roadArgs, roadOwner)
             edgeIndex += 1
@@ -1040,6 +1058,8 @@ class CatanGame(PygameGame):
                 tokenColor = Colors.BLACK
             else:
                 tokenColor = Colors.BLACK
+            if (hasRobber):
+                tokenColor = Colors.GRAY
             token = Text.TOKEN_FONT.render(str(number), True, tokenColor)
             tokenSurf = token.get_rect()
             tokenSurf.center = center

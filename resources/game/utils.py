@@ -96,20 +96,3 @@ class Utils(object):
                   None:Colors.WHITE}
         tileFill = colors[tile.type]
         return tileFill
-
-    # @staticmethod
-    # def getPlayerFromColor(players, color):
-    #     player = None
-    #     for key in Colors.PLAYER:
-    #         if (Colors.PLAYER[key][0] == color):
-    #             player = key
-    #         print(player, Colors.PLAYER[key][0], color)
-    #     return players[player] if player is not None else None
-
-    # # Checks if given position is within the bounds.
-    # @staticmethod
-    # def inBounds(pos, bounds):
-    #     x, y = pos
-    #     x0, y0, x1, y1 = bounds
-    #     return (x > x0 and x < x1 and y > y0 and y < y1)
-        

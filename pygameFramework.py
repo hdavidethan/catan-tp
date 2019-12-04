@@ -33,6 +33,7 @@ class PygameGame(object):
         self.title = title
         self._running = True
         self._paused = False
+        pygame.mixer.pre_init(44100, -16, 2, 1024)
         pygame.init()
 
     def run(self):

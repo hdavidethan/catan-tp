@@ -46,6 +46,7 @@ class Button(Element):
     # Handler for onClick events.
     def onClick(self, game):
         if (not self.isDisabled):
+            game.soundCache['buttonClick'].play()
             if (isinstance(self.binding, tuple)):
                 if (self.binding[0] == 'changeMode'):
                     game.setActiveMode(self.binding[1])
@@ -88,7 +89,6 @@ class Button(Element):
                     game.checkAICount()
                     game.checkSetupConfirm()
                 elif (self.binding[0] == 'setupConfirm'):
-                    print(1)
                     game.setActiveMode('game', game.humanCount, game.aiCount)
                 elif (self.binding[0] == 'quit'):
                     game._running = False

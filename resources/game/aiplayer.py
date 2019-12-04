@@ -15,11 +15,10 @@ class AIPlayer(Player):
     def __init__(self, index):
         super().__init__(index)
         self.priorityNode = None
-        print(f'Initialized AI Player {self.index}')
 
     # Starts the turn for AI Players (analogous to startTurn() in app.py)
     def startTurn(self, game):
-        print('Starting Turn of Player' + f'{self.index}' + f' {self.priorityNode}')
+        playerIndex = self.index + 1
         moves = self.getLegalMoves(game)
         if (len(moves) > 0):
             actions = []
@@ -36,12 +35,18 @@ class AIPlayer(Player):
                         del moveDict[key]
             if ('buildSettlement' in actions and moveDict['buildSettlement'][1] != set()):
                 nextMove = moveDict['buildSettlement']
-                print('Build Settlement', nextMove)
             elif (len(moveDict.keys()) > 0):
                 actions = []
                 for key in moveDict:
                     actions.append(key)
-                nextAction = random.choice(actions)
+                if ('setup' in actions):
+                    nextAction = 'setup'
+                elif ('buildRoad' in actions):
+                    nextAction = 'buildRoad'
+                elif ('buildCity' in actions):
+                    nextAction = 'buildCity'
+                elif ('buildDevCard' in actions):
+                    nextAction = 'buildDevCard'
                 nextMove = moveDict[nextAction]
             self.doMove(game, nextMove)
     
@@ -124,6 +129,9 @@ class AIPlayer(Player):
         elif (move == 'buildRoad'):
             if (len(validSet) >= 1):
                 self.doRoadMove(game, validSet)
+        
+        elif (move == 'buildDevCard'):
+            game.buildMode('devCard')
     
     # Performs the move if the move is a road move.
     def doRoadMove(self, game, roads):
@@ -187,6 +195,8 @@ class AIPlayer(Player):
             if (city[1]):
                 validCities = self.getLegalCities(game)
                 moves.append(('buildCity', validCities))
+            if (devCard[1]):
+                moves.append(('buildDevCard', None))
             return moves
 
     # Returns the legal roads to build
@@ -249,7 +259,6 @@ class AIPlayer(Player):
 
     # Sets the priority node for AI Players
     def setPriorityNode(self, game):
-        print(1)
         if (self.priorityNode == None):
             nodeList = self.getBestNodeList(game)
             validNodes = []
@@ -270,8 +279,6 @@ class AIPlayer(Player):
         elif (not game.board.nodes[self.priorityNode].buildable or game.board.nodes[self.priorityNode].owner != None):
             self.priorityNode = None
             self.setPriorityNode(game)
-        else:
-            print(game.board.nodes[self.priorityNode].buildable)
     
     # Returns a list of best nodes in descending order
     def getBestNodeList(self, game):
@@ -303,7 +310,6 @@ class AIPlayer(Player):
                 noOwnerCondition = node.owner == None and (None in roadOwners and self.bgColor in roadOwners)
                 if (node.owner == self or noOwnerCondition):
                     nodeOrder = self.dijkstraRoads(game, node, destination)[0]
-                    print(self.index, nodeOrder)
                     paths.append(nodeOrder)
         return paths
 
