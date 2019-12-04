@@ -23,6 +23,11 @@ class Text(object):
     DISCARD_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 18*sizeFactor)
     STEAL_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 18*sizeFactor)
     PAUSED_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 36*sizeFactor)
+    VICTORY_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 36*sizeFactor)
+    SETUP_TITLE_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 36*sizeFactor)
+    SETUP_COUNT_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 24*sizeFactor)
+    SETUP_LABEL_FONT = pygame.font.Font("resources/assets/fonts/minion-regular.ttf", 28*sizeFactor)
+    INC_DEC_FONT = pygame.font.Font("resources/assets/fonts/cabin-regular.ttf", 28*sizeFactor)
 
     # Text Constants
     BUILD = dict()

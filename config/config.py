@@ -12,19 +12,46 @@ class windowConfig(object):
     HEIGHT_TO_WIDTH_RATIO = 32 / 35
 
     # Button Positions
-    MENU_B1 = (0.5 * WIDTH, 0.5 * HEIGHT)
-    MENU_B1_SIZE = (0.25 * WIDTH, 0.085 * HEIGHT)
-    MENU_B2 = (0.5 * WIDTH, 0.72 * HEIGHT)
-    MENU_B2_SIZE = (0.25 * WIDTH, 0.085 * HEIGHT)
-    MENU_B3 = (0.5 * WIDTH, 0.61 * HEIGHT)
+    MENU_B1 = (0.5 * WIDTH, 0.54 * HEIGHT)
+    MENU_B2 = (0.5 * WIDTH, 0.68 * HEIGHT)
+    MENU_SIZE = (0.25 * WIDTH, 0.085 * HEIGHT)
 
     # Logo
     LOGO = (0.5 * WIDTH, 0.25 * HEIGHT)
     LOGO_SCALE = 0.2
 
     # Menu Container
-    MENU_CONTAINER = (0.34 * WIDTH, 0.4 * HEIGHT)
-    MENU_CONTAINER_SIZE = (0.32 * WIDTH, 0.42 * HEIGHT)
+    MENU_CONTAINER = (0.34 * WIDTH, 0.44 * HEIGHT)
+    MENU_CONTAINER_SIZE = (0.32 * WIDTH, 0.34 * HEIGHT)
+
+    # Setup Container
+    SETUP_CONTAINER = (0.15 * WIDTH, 0.4 * HEIGHT)
+    SETUP_CONTAINER_SIZE = (0.7 * WIDTH, 0.5 * HEIGHT)
+    SETUP_TITLE = (0.5 * WIDTH, 0.47 * HEIGHT)
+    SETUP_HUMAN = (0.35 * WIDTH, 0.58 * HEIGHT)
+    SETUP_HUMAN_COUNT = (0.35 * WIDTH, 0.65 * HEIGHT)
+    SETUP_AI = (0.65 * WIDTH, 0.58 * HEIGHT)
+    SETUP_AI_COUNT = (0.65 * WIDTH, 0.65 * HEIGHT)
+
+    # Setup Buttons
+    SETUP_HUMAN_DEC = (0.3 * WIDTH, 0.65 * HEIGHT)
+    SETUP_HUMAN_INC = (0.4 * WIDTH, 0.65 * HEIGHT)
+    SETUP_AI_DEC = (0.6 * WIDTH, 0.65 * HEIGHT)
+    SETUP_AI_INC = (0.7 * WIDTH, 0.65 * HEIGHT)
+    SETUP_INC_DEC_SIZE = (0.05 * sizeFactor, 0.05 * sizeFactor)
+    SETUP_CONFIRM = (0.5 * WIDTH, 0.8 * HEIGHT)
+    SETUP_CONFIRM_SIZE = (0.25 * WIDTH, 0.075 * HEIGHT)
+
+    # Pause Menu Buttons
+    PAUSE_RESUME = (0.5 * WIDTH, 0.5 * HEIGHT)
+    PAUSE_RESTART = (0.5 * WIDTH, 0.64 * HEIGHT)
+    PAUSE_QUIT = (0.5 * WIDTH, 0.78 * HEIGHT)
+    PAUSE_SIZE = (0.25 * WIDTH, 0.085 * HEIGHT)
+
+    # Victory Buttons
+    VICTORY_RESTART = (0.5 * WIDTH, 0.64 * HEIGHT)
+    VICTORY_QUIT = (0.5 * WIDTH, 0.78 * HEIGHT)
+    VICTORY_SIZE = (0.25 * WIDTH, 0.085 * HEIGHT)
 
     # Game Scorecards
     SCORE_1 = (0, 0.8 * HEIGHT)

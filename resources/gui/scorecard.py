@@ -8,6 +8,7 @@ import pygame
 from resources.gui.element import Element
 from config.colors import Colors
 from config.text import Text
+from resources.game.aiplayer import AIPlayer
 
 class Scorecard(Element):
     def __init__(self, player, pos, size):
@@ -53,7 +54,8 @@ class Scorecard(Element):
         for t in labels:
             screen.blit(t[0], t[1])
         playerIndex = self.player.index + 1
-        playerLabel = Text.SCORE_FONT.render(f'Player {playerIndex}', True, self.player.textColor)
+        playerType = 'COM' if isinstance(self.player, AIPlayer) else 'Player'
+        playerLabel = Text.SCORE_FONT.render(f'{playerType} {playerIndex}', True, self.player.textColor)
         playerPos = playerLabel.get_rect()
         playerPos.centery = y + dy
         playerPos.left = x + 0.1 * width

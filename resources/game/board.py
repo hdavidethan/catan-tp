@@ -13,7 +13,7 @@ from resources.game.aiplayer import AIPlayer
 import copy, random
 
 class Board(object):
-    def __init__(self, r=5, q=5, AIGame=False):
+    def __init__(self, r=5, q=5, human=4, ai=0):
         self.r = r
         self.q = q
         self.hexBoard = generateAxialList(self.r, self.q)
@@ -31,11 +31,16 @@ class Board(object):
         self.assignTypes()
         self.assignNumbers()
 
-        self.AIGame = AIGame
-        if (self.AIGame == False):
-            self.players = [Player(0), Player(1), Player(2), Player(3)]
-        else:
-            self.players = [Player(0), AIPlayer(1), AIPlayer(2), AIPlayer(3)]
+        self.humanCount = human
+        self.aiCount = ai
+        self.players = []
+        playerIndex = 0
+        for i in range(self.humanCount):
+            self.players.append(Player(playerIndex))
+            playerIndex += 1
+        for i in range(self.aiCount):
+            self.players.append(AIPlayer(playerIndex))
+            playerIndex += 1
     
     # Generates the Edge objects into a list.
     def generateEdges(self):

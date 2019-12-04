@@ -14,7 +14,7 @@ from config.text import Text
 import pygame
 
 class Button(Element):
-    def __init__(self, pos, size, text, colors, binding, radius=0, isDisabled=False, font=Text.BUTTON_FONT):
+    def __init__(self, pos, size, text, colors, binding, radius=0, isDisabled=False, font=Text.BUTTON_FONT, isPauseButton=False):
         super().__init__(pos, size)
         self.text = text
         self.radius = radius
@@ -22,6 +22,7 @@ class Button(Element):
         self.colors = colors
         self.isDisabled = isDisabled
         self.font = font
+        self.isPauseButton = isPauseButton
     
     def __eq__(self, other):
         return isinstance(other, Button) and (self.pos == other.pos)
@@ -37,7 +38,7 @@ class Button(Element):
         if (self.isDisabled):
             return (buttonDisabled, textDisabled)
         else:
-            if (mx > x0 and mx < x1 and my > y0 and my < y1 and not game.isPaused):
+            if (mx > x0 and mx < x1 and my > y0 and my < y1 and (not game.isPaused or self.isPauseButton)):
                 return (secondary, text)
             else:
                 return (primary, text)
@@ -47,10 +48,7 @@ class Button(Element):
         if (not self.isDisabled):
             if (isinstance(self.binding, tuple)):
                 if (self.binding[0] == 'changeMode'):
-                    if ('AI' in self.binding):
-                        game.setActiveMode(self.binding[1], AIGame=True)
-                    else:
-                        game.setActiveMode(self.binding[1])
+                    game.setActiveMode(self.binding[1])
                 elif (self.binding[0] == 'endTurn'):
                     if (game.discardMode):
                         game.endDiscard()
@@ -74,6 +72,24 @@ class Button(Element):
                     game.startDevCard()
                 elif (self.binding[0] == 'confirmDevCard'):
                     Button.devCardHandler(game, self.binding)
+                elif (self.binding[0] == 'pause'):
+                    game.isPaused = not game.isPaused
+                elif (self.binding[0] == 'restart'):
+                    game.isPaused = False
+                    game.setActiveMode('game', human=game.board.humanCount, ai=game.board.aiCount)
+                elif (self.binding[0] == 'humanIncDec'):
+                    game.humanCount += self.binding[1]
+                    game.checkHumanCount()
+                    game.checkAICount()
+                    game.checkSetupConfirm()
+                elif (self.binding[0] == 'aiIncDec'):
+                    game.aiCount += self.binding[1]
+                    game.checkHumanCount()
+                    game.checkAICount()
+                    game.checkSetupConfirm()
+                elif (self.binding[0] == 'setupConfirm'):
+                    print(1)
+                    game.setActiveMode('game', game.humanCount, game.aiCount)
                 elif (self.binding[0] == 'quit'):
                     game._running = False
     
