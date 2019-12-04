@@ -701,21 +701,28 @@ class CatanGame(PygameGame):
                 self.setActiveMode('menu')
             elif (key == pygame.K_r):
                 self.setActiveMode('game')
-            # HACK: CHEAT FOR DEBUG ONLY
             elif (key == pygame.K_c):
                 for player in self.board.players:
                     player.resources[random.choice(['grain', 'lumber', 'ore', 'sheep', 'brick'])] += 1
+            elif (key == pygame.K_1):
+                player = self.board.players[self.currentPlayer]
+                player.resources['lumber'] += 1
+            elif (key == pygame.K_2):
+                player = self.board.players[self.currentPlayer]
+                player.resources['brick'] += 1
+            elif (key == pygame.K_3):
+                player = self.board.players[self.currentPlayer]
+                player.resources['sheep'] += 1
+            elif (key == pygame.K_4):
+                player = self.board.players[self.currentPlayer]
+                player.resources['grain'] += 1
+            elif (key == pygame.K_5):
+                player = self.board.players[self.currentPlayer]
+                player.resources['ore'] += 1
             elif (key == pygame.K_ESCAPE):
                 self.isPaused = not self.isPaused
-            elif (key == pygame.K_e):
-                self.board.players[self.currentPlayer].countRoads(self)
             elif (key == pygame.K_y):
                 self.board.players[self.currentPlayer].devCards['yearOfPlenty'] += 1
-        elif (self.activeMode == 'menu'):
-            if (key == pygame.K_a):
-                self.setActiveMode('game', AIGame=True)
-            elif (key == pygame.K_n):
-                self.setActiveMode('setup')
 
     # Handles mouse presses
     def mousePressed(self, mx, my):

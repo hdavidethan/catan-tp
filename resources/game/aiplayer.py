@@ -62,6 +62,7 @@ class AIPlayer(Player):
             nextDiscard = random.choice(resources)
             Button.discardHandler(game, ('discard', nextDiscard))
 
+    # Starts the Robber Place Mode for AI Players (analogous to method in app.py)
     def robberMode(self, game, tileSet):
         board = game.board
         tileValues = dict()
@@ -93,6 +94,7 @@ class AIPlayer(Player):
                 Button.robberHandler(game, ('placeRobber', (tile, self)))
                 break
     
+    # Starts the Steal Mode for AI Players (analogoes to method in app.py)
     def stealChoice(self, game, victimSet):
         choice = game.board.players[random.choice(list(victimSet))]
         Button.stealHandler(game, ('stealConfirm', choice))
