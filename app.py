@@ -229,7 +229,7 @@ class CatanGame(PygameGame):
         for devCard in devCards:
             devCardButton = Button(windowConfig.DEVCARD_CHOICE[devCard],
                                 windowConfig.DEVCARD_CHOICE_SIZE, '*', Colors.BUTTON_COLORS,
-                                ('confirmDevCard', (devCard, self.board.players[self.currentPlayer])), 0.4, font=Text.DISCARD_FONT)
+                                ('confirmDevCard', (devCard, None)), 0.4, font=Text.DISCARD_FONT)
             self.devCardElements[devCard] = devCardButton
     
     # Wrapper to initialize road positions

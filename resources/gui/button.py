@@ -144,6 +144,8 @@ class Button(Element):
     def devCardHandler(game, binding):
         game.devCardMode = False
         devCard, player = binding[1]
+        if (player == None):
+            player = game.board.players[game.currentPlayer]
         if (devCard == 'knight'):
             player.devCards['knight'] -= 1
             player.largestArmy += 1
@@ -154,13 +156,15 @@ class Button(Element):
     
     @staticmethod
     def discardHandler(game, binding):
-        player = game.board.players[game.currentPlayer]
-        game.discardResource(player, binding[1])
+        if (game.discardMode):
+            player = game.board.players[game.currentPlayer]
+            game.discardResource(player, binding[1])
     
     @staticmethod
     def claimHandler(game, binding):
-        player = game.board.players[game.currentPlayer]
-        game.claimResource(player, binding[1])
+        if (game.yearOfPlentyMode):
+            player = game.board.players[game.currentPlayer]
+            game.claimResource(player, binding[1])
     
     @staticmethod
     def robberHandler(game, binding):
