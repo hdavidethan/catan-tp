@@ -54,6 +54,7 @@ class CatanGame(PygameGame):
         pygame.mixer.music.set_volume(0.7)
         self.musicPaused = False
         self.soundCache['buttonClick'] = pygame.mixer.Sound('resources/assets/audio/button.ogg')
+        self.soundCache['buttonClick'].set_volume(0.7)
 
     # Loads an image into an image cache and returns the cached image
     def loadImageFromCache(self, path):
@@ -288,6 +289,7 @@ class CatanGame(PygameGame):
             player.startTurn(self)
         else:
             self.checkForLongestRoad()
+            self.checkForLargestArmy()
             self.checkBuildConditions(player)
             self.useDevCardConditions(player)
 
@@ -352,7 +354,6 @@ class CatanGame(PygameGame):
     
     # Starts the round of discarding extra cards when 7 is rolled.
     def startDiscard(self):
-        print('started')
         self.discardMode = True
         self.currentPlayer = self.toDiscard.pop(0)
         player = self.board.players[self.currentPlayer]
@@ -369,6 +370,8 @@ class CatanGame(PygameGame):
         player.discardGoal = player.countCards() + 2
         self.checkYearOfPlentyConditions(player)
         self.checkEndTurnConditions(player)
+        if (isinstance(player, AIPlayer)):
+            player.startYearOfPlenty(self)
 
     # Starts the development card phase
     def startDevCard(self):
@@ -551,6 +554,21 @@ class CatanGame(PygameGame):
                 else:
                     player.hasLongestRoad = True
 
+    def checkForLargestArmy(self):
+        maxPlayer = None
+        maxAmount = -1
+        for player in self.board.players:
+            amount = player.largestArmy
+            if (amount > maxAmount):
+                maxAmount = amount
+                maxPlayer = player
+        if (maxPlayer != None and maxAmount >= 3):
+            for player in self.board.players:
+                if (player != maxPlayer):
+                    player.hasLargestArmy = False
+                else:
+                    player.hasLargestArmy = True
+
     # Checks for total victory points of the current player.
     def checkVictoryPoints(self):
         player = self.board.players[self.currentPlayer]
@@ -560,7 +578,11 @@ class CatanGame(PygameGame):
             longestRoad = 2
         else:
             longestRoad = 0
-        player.victoryPoints = settlements + 2 * cities + longestRoad
+        if (player.hasLargestArmy):
+            largestArmy = 2
+        else:
+            largestArmy = 0
+        player.victoryPoints = settlements + 2 * cities + longestRoad + largestArmy
 
     # Checks if any player has achieved the VP threshold. Returns the player.
     def checkVictory(self):

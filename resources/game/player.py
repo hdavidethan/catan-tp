@@ -14,6 +14,7 @@ class Player(object):
         self.longestRoad = 0
         self.hasLongestRoad = False
         self.largestArmy = 0
+        self.hasLargestArmy = False
         self.roads = set()
         self.settlements = set()
         self.cities = set()

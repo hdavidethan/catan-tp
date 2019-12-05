@@ -137,6 +137,7 @@ class Button(Element):
         game.checkBuildConditions(player)
         player.longestRoad = player.countRoads(game)
         game.checkForLongestRoad()
+        game.checkForLargestArmy()
         game.checkVictoryPoints()
 
     @staticmethod
@@ -144,9 +145,9 @@ class Button(Element):
         game.devCardMode = False
         devCard, player = binding[1]
         if (devCard == 'knight'):
-            game.robberMode()
             player.devCards['knight'] -= 1
             player.largestArmy += 1
+            game.robberMode()
         elif (devCard == 'yearOfPlenty'):
             game.startYearOfPlenty()
             player.devCards['yearOfPlenty'] -= 1

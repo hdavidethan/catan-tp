@@ -35,10 +35,15 @@ class Scorecard(Element):
         labels = []
         for i in range(3):
             # Longest Road Color Handler
-            if (i != 1):
+            if (i not in [1, 2]):
                 textColor = self.player.textColor
             else:
                 if (self.player.hasLongestRoad):
+                    if (self.player.textColor == Colors.BLACK):
+                        textColor = Colors.RED_1
+                    else:
+                        textColor = Colors.RED_2
+                elif (self.player.hasLargestArmy):
                     if (self.player.textColor == Colors.BLACK):
                         textColor = Colors.RED_1
                     else:

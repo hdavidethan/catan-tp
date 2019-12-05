@@ -19,7 +19,6 @@ class AIPlayer(Player):
     # Starts the turn for AI Players (analogous to startTurn() in app.py)
     def startTurn(self, game):
         playerIndex = self.index + 1
-        print(playerIndex, game.dice1.value + game.dice2.value)
         moves = self.getLegalMoves(game)
         if (len(moves) > 0):
             actions = []
@@ -50,6 +49,8 @@ class AIPlayer(Player):
                     nextAction = 'buildDevCard'
                 elif ('knight' in actions):
                     nextAction = 'knight'
+                elif ('yearOfPlenty' in actions):
+                    nextAction = 'yearOfPlenty'
                 elif ('buildSettlement' in actions):
                     nextMove = None
                 if (nextMove != None):
@@ -70,10 +71,16 @@ class AIPlayer(Player):
     # Starts the Discard Phase for AI Players (analogous to startDiscard() in app.py)
     def startDiscard(self, game):
         while self.countCards() > self.discardGoal:
-            print(1234)
             resources = game.checkDiscardConditions(self)
             nextDiscard = random.choice(resources)
             Button.discardHandler(game, ('discard', nextDiscard))
+
+    def startYearOfPlenty(self, game):
+        while self.countCards() < self.discardGoal:
+            values = list(self.resources.values())
+            keys = list(self.resources.keys())
+            minResource = keys[values.index(min(values))]
+            Button.claimHandler(game, ('discard', minResource))
 
     # Starts the Robber Place Mode for AI Players (analogous to method in app.py)
     def robberMode(self, game, tileSet):
@@ -142,7 +149,10 @@ class AIPlayer(Player):
             game.buildMode('devCard')
         
         elif (move == 'knight'):
-            game.robberMode()
+            Button.devCardHandler(game, ('confirmDevCard', ('knight', self)))
+        
+        elif (move == 'yearOfPlenty'):
+            Button.devCardHandler(game, ('confirmDevCard', ('yearOfPlenty', self)))
     
     # Performs the move if the move is a road move.
     def doRoadMove(self, game, roads):
@@ -211,6 +221,8 @@ class AIPlayer(Player):
             devCardConditions = game.devCardChoiceConditions(self)
             if ('knight' in devCardConditions and (game.dice1.value + game.dice2.value != 7)):
                 moves.append(('knight', None))
+            if ('yearOfPlenty' in devCardConditions):
+                moves.append(('yearOfPlenty', None))
             return moves
 
     # Returns the legal roads to build
