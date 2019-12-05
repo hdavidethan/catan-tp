@@ -47,6 +47,7 @@ class CatanGame(PygameGame):
         self.initAudio()
         self.setActiveMode('menu')
     
+    # Initializes the Audio objects
     def initAudio(self):
         pygame.mixer.music.load('resources/assets/audio/catan.ogg')
         pygame.mixer.music.play(-1)
@@ -106,11 +107,16 @@ class CatanGame(PygameGame):
     # Runs upon Setup Mode activation/switch
     def initSetup(self):
         self.elements = set()
-        humanPlus = Button(windowConfig.SETUP_HUMAN_INC, windowConfig.SETUP_INC_DEC_SIZE, '+', Colors.BUTTON_COLORS, ('humanIncDec', +1), 0.4, font=Text.INC_DEC_FONT)
-        humanMinus = Button(windowConfig.SETUP_HUMAN_DEC, windowConfig.SETUP_INC_DEC_SIZE, '-', Colors.BUTTON_COLORS, ('humanIncDec', -1), 0.4, font=Text.INC_DEC_FONT)
-        aiPlus = Button(windowConfig.SETUP_AI_INC, windowConfig.SETUP_INC_DEC_SIZE, '+', Colors.BUTTON_COLORS, ('aiIncDec', +1), 0.4, font=Text.INC_DEC_FONT)
-        aiMinus = Button(windowConfig.SETUP_AI_DEC, windowConfig.SETUP_INC_DEC_SIZE, '-', Colors.BUTTON_COLORS, ('aiIncDec', -1), 0.4, font=Text.INC_DEC_FONT)
-        setupConfirm = Button(windowConfig.SETUP_CONFIRM, windowConfig.SETUP_CONFIRM_SIZE, 'Start Game', Colors.BUTTON_COLORS, ('setupConfirm', None), 0.4)
+        humanPlus = Button(windowConfig.SETUP_HUMAN_INC, windowConfig.SETUP_INC_DEC_SIZE, 
+            '+', Colors.BUTTON_COLORS, ('humanIncDec', +1), 0.4, font=Text.INC_DEC_FONT)
+        humanMinus = Button(windowConfig.SETUP_HUMAN_DEC, windowConfig.SETUP_INC_DEC_SIZE,
+            '-', Colors.BUTTON_COLORS, ('humanIncDec', -1), 0.4, font=Text.INC_DEC_FONT)
+        aiPlus = Button(windowConfig.SETUP_AI_INC, windowConfig.SETUP_INC_DEC_SIZE, '+',
+            Colors.BUTTON_COLORS, ('aiIncDec', +1), 0.4, font=Text.INC_DEC_FONT)
+        aiMinus = Button(windowConfig.SETUP_AI_DEC, windowConfig.SETUP_INC_DEC_SIZE, '-',
+            Colors.BUTTON_COLORS, ('aiIncDec', -1), 0.4, font=Text.INC_DEC_FONT)
+        setupConfirm = Button(windowConfig.SETUP_CONFIRM, windowConfig.SETUP_CONFIRM_SIZE,
+            'Start Game', Colors.BUTTON_COLORS, ('setupConfirm', None), 0.4)
         self.elements.add(humanPlus)
         self.elements.add(humanMinus)
         self.elements.add(aiPlus)
@@ -207,6 +213,7 @@ class CatanGame(PygameGame):
         self.pauseElements.add(restartButton)
         self.pauseElements.add(quitButton)
 
+    # Initializes the button elements for the Victory Mode
     def initVictoryElements(self):
         restartButton = Button(windowConfig.VICTORY_RESTART, windowConfig.PAUSE_SIZE,
             'Rematch', Colors.BUTTON_COLORS, ('restart', None), 0.4, isPauseButton=True)
@@ -217,7 +224,7 @@ class CatanGame(PygameGame):
 
     # Initializes the discard button elements for Discard Mode
     def initDevCardElements(self):
-        devCards = ['knight', 'yearOfPlenty', 'monopoly', 'roadBuilding']
+        devCards = ['knight', 'yearOfPlenty']
         for devCard in devCards:
             devCardButton = Button(windowConfig.DEVCARD_CHOICE[devCard],
                                 windowConfig.DEVCARD_CHOICE_SIZE, '*', Colors.BUTTON_COLORS,
@@ -399,14 +406,16 @@ class CatanGame(PygameGame):
                 if (node.nodeLevel == 0 and node.buildable and (self.setupMode or validNode)):
                     cx, cy = node.pos
                     nodeButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
-                            None, Colors.SELECT_BUTTON_COLORS, ('buildConfirm', (node, self.board.players[self.currentPlayer])), 0.4)
+                            None, Colors.SELECT_BUTTON_COLORS, ('buildConfirm', 
+                            (node, self.board.players[self.currentPlayer])), 0.4)
                     self.selectElements.add(nodeButton)
         elif (build == 'city'):
             for node in self.board.nodes:
                 if (node.nodeLevel == 1 and node.owner.index == self.currentPlayer):
                     cx, cy = node.pos
                     nodeButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
-                            None, Colors.SELECT_BUTTON_COLORS, ('buildConfirm', (node, self.board.players[self.currentPlayer])), 0.4)
+                            None, Colors.SELECT_BUTTON_COLORS, ('buildConfirm', 
+                            (node, self.board.players[self.currentPlayer])), 0.4)
                     self.selectElements.add(nodeButton)
         elif (build == 'road'):
             seen = set()
@@ -446,10 +455,11 @@ class CatanGame(PygameGame):
                     if (edge.road == None):
                         cx, cy = edge.pos
                         roadButton = Button((cx, cy), windowConfig.SELECT_BUTTON_SIZE,
-                            None, Colors.SELECT_BUTTON_COLORS, ('buildConfirm', (edge, self.board.players[self.currentPlayer])), 0.4)
+                            None, Colors.SELECT_BUTTON_COLORS, ('buildConfirm', 
+                            (edge, self.board.players[self.currentPlayer])), 0.4)
                         self.selectElements.add(roadButton)
         elif (build == 'devCard'):
-            devCards = ['knight'] * 14 + ['yearOfPlenty'] * 2 + ['roadBuilding'] * 2 + ['monopoly'] * 2 + ['victoryPoint'] * 5
+            devCards = ['knight'] * 14 + ['yearOfPlenty'] * 2 + ['victoryPoint'] * 5 # ['roadBuilding'] * 2 + ['monopoly'] * 2 + 
             chosenCard = random.choice(devCards)
             devCards.remove(chosenCard)
             player = self.board.players[self.currentPlayer]
@@ -516,6 +526,8 @@ class CatanGame(PygameGame):
                         self.stealElements[key].isDisabled = True
         else:
             self.stealMode = False
+            self.checkBuildConditions(player)
+            self.useDevCardConditions(player)
             self.checkEndTurnConditions(player)
     
     #################################################
@@ -562,7 +574,7 @@ class CatanGame(PygameGame):
         for devCard in player.devCards:
             if (devCard != 'victoryPoint'):
                 total += player.devCards[devCard]
-        if (total > 0):
+        if (total > 0 and not isinstance(player, AIPlayer)):
             for element in self.elements:
                 if (element == tmpButton):
                     element.isDisabled = False
@@ -574,7 +586,7 @@ class CatanGame(PygameGame):
     # Checks for the conditions to use any development card
     def devCardChoiceConditions(self, player):
         for devCard in player.devCards:
-            if (devCard != 'victoryPoint'):
+            if (devCard not in ['victoryPoint', 'monopoly', 'roadBuilding']):
                 count = player.devCards[devCard]
                 if (player.devCards[devCard] < 1):
                     self.devCardElements[devCard].isDisabled = True
@@ -595,8 +607,8 @@ class CatanGame(PygameGame):
 
     # Checks if the turn can be ended by the current player.
     def checkEndTurnConditions(self, player):
-        discardCondition = self.discardMode and self.board.players[self.currentPlayer].countCards() > player.discardGoal
-        yearOfPlentyCondition = self.yearOfPlentyMode and self.board.players[self.currentPlayer].countCards() < player.discardGoal
+        discardCondition = self.discardMode and player.countCards() > player.discardGoal
+        yearOfPlentyCondition = self.yearOfPlentyMode and player.countCards() < player.discardGoal
         inSubMode = self.inRobberMode or self.stealMode
         if (discardCondition or yearOfPlentyCondition or inSubMode):
             tmpButton = Button(windowConfig.END_TURN, None, None, None, None)
@@ -620,18 +632,27 @@ class CatanGame(PygameGame):
         setupRoads = (self.setupMode and 
                     (len(player.roads) < len(player.settlements)))
         roadCondition = (((not self.setupMode and roadResources and 
-                    settlementExists) and not self.discardMode) or setupRoads)
+                    settlementExists) and not self.discardMode
+                    and not self.inRobberMode and not self.inBuildMode
+                    and not self.yearOfPlentyMode and not self.stealMode) or setupRoads)
         # Settlement Conditions
         settlementResources = (player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
                             and player.resources['grain'] >= 1 and player.resources['sheep'] >= 1)
-        settlementCondition = ((settlementResources or (self.setupMode and ((self.turn // self.playerCount == 1 and len(player.settlements) == 0) or
-                            (self.turn // self.playerCount == 0 and len(player.settlements) == 1)))) and not self.discardMode)
+        settlementCondition = ((settlementResources or (self.setupMode and
+                            ((self.turn // self.playerCount == 1 and len(player.settlements) == 0) or
+                            (self.turn // self.playerCount == 0 and len(player.settlements) == 1)))) and not self.discardMode 
+                            and not self.inRobberMode and not self.inBuildMode
+                            and not self.yearOfPlentyMode and not self.stealMode)
         # City Conditions
         cityCondition = ((player.resources['ore'] >= 3 and player.resources['grain'] >= 2
-                            and len(player.settlements) > 0) and not self.discardMode)
+                            and len(player.settlements) > 0) and not self.discardMode 
+                            and not self.inRobberMode and not self.inBuildMode
+                        and not self.yearOfPlentyMode and not self.stealMode)
         # Dev Card Conditions
         devCardCondition = ((not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
-                            and player.resources['grain'] >= 1) and not self.discardMode)
+                            and player.resources['grain'] >= 1) and not self.discardMode 
+                            and not self.inRobberMode and not self.inBuildMode
+                            and not self.yearOfPlentyMode and not self.stealMode)
         # Compile conditions
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))
@@ -656,6 +677,7 @@ class CatanGame(PygameGame):
     # GAME SETUP CONDITION LOGIC
     #################################################
 
+    # Checks if the number of human players is valid.
     def checkHumanCount(self):
         incElement = Button(windowConfig.SETUP_HUMAN_INC, None, None, None, None)
         decElement = Button(windowConfig.SETUP_HUMAN_DEC, None, None, None, None)
@@ -671,6 +693,7 @@ class CatanGame(PygameGame):
                 else:
                     element.isDisabled = False
     
+    # Checks if the number of AI players is valid.
     def checkAICount(self):
         incElement = Button(windowConfig.SETUP_AI_INC, None, None, None, None)
         decElement = Button(windowConfig.SETUP_AI_DEC, None, None, None, None)
@@ -686,6 +709,7 @@ class CatanGame(PygameGame):
                 else:
                     element.isDisabled = False
     
+    # Checks if the total number of players is valid.
     def checkSetupConfirm(self):
         confirmElement = Button(windowConfig.SETUP_CONFIRM, None, None, None, None)
         for element in self.elements:
@@ -741,6 +765,8 @@ class CatanGame(PygameGame):
                 self.board.players[self.currentPlayer].devCards['knight'] += 1
             elif (key == pygame.K_F7):
                 self.fogOfWar = not self.fogOfWar
+            self.checkBuildConditions(self.board.players[self.currentPlayer])
+            self.useDevCardConditions(self.board.players[self.currentPlayer])
 
     # Handles mouse presses
     def mousePressed(self, mx, my):
@@ -810,6 +836,7 @@ class CatanGame(PygameGame):
         for pauseElement in self.pauseElements:
             pauseElement.draw(screen, self)
 
+    # Draw the Victory Screen
     def drawVictory(self, screen):
         container = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         container.fill(Colors.BLACK_PAUSED)

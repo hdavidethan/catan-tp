@@ -178,4 +178,6 @@ class Button(Element):
         victim.resources[resource] -= 1
         currentPlayer.resources[resource] += 1
         game.stealMode = False
+        game.checkBuildConditions(currentPlayer)
+        game.useDevCardConditions(currentPlayer)
         game.checkEndTurnConditions(currentPlayer)

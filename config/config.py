@@ -96,10 +96,10 @@ class windowConfig(object):
     DISCARD['ore'] = (0.63 * WIDTH, 0.92 * HEIGHT)
 
     DEVCARD_CHOICE = dict()
-    DEVCARD_CHOICE['knight'] = (0.35 * WIDTH, 0.08 * HEIGHT)
-    DEVCARD_CHOICE['yearOfPlenty'] = (0.45 * WIDTH, 0.08 * HEIGHT)
-    DEVCARD_CHOICE['monopoly'] = (0.55 * WIDTH, 0.08 * HEIGHT)
-    DEVCARD_CHOICE['roadBuilding'] = (0.65 * WIDTH, 0.08 * HEIGHT)
+    DEVCARD_CHOICE['knight'] = (0.45 * WIDTH, 0.08 * HEIGHT)
+    DEVCARD_CHOICE['yearOfPlenty'] = (0.55 * WIDTH, 0.08 * HEIGHT)
+    # DEVCARD_CHOICE['monopoly'] = (0.55 * WIDTH, 0.08 * HEIGHT)
+    # DEVCARD_CHOICE['roadBuilding'] = (0.65 * WIDTH, 0.08 * HEIGHT)
     DEVCARD_CHOICE_SIZE = (0.04 * sizeFactor, 0.04 * sizeFactor)
 
     STEAL = dict()
