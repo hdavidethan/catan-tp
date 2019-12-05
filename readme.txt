@@ -23,4 +23,7 @@ r - Forces a Game restart with the same setup settings
 3 - Gives the current player 1 sheep
 4 - Gives the current player 1 grain
 5 - Gives the current player 1 ore
+k - Gives the current player 1 knight dev card
+y - Gives the current player 1 year of plenty dev card
+v - Triggers victory for the current player
 F7 - Toggle "Fog of War" (see AI Players' hands)
