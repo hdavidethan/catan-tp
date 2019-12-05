@@ -19,6 +19,7 @@ class AIPlayer(Player):
     # Starts the turn for AI Players (analogous to startTurn() in app.py)
     def startTurn(self, game):
         playerIndex = self.index + 1
+        print(playerIndex, game.dice1.value + game.dice2.value)
         moves = self.getLegalMoves(game)
         if (len(moves) > 0):
             actions = []
@@ -47,6 +48,8 @@ class AIPlayer(Player):
                     nextAction = 'buildCity'
                 elif ('buildDevCard' in actions):
                     nextAction = 'buildDevCard'
+                elif ('knight' in actions):
+                    nextAction = 'knight'
                 elif ('buildSettlement' in actions):
                     nextMove = None
                 if (nextMove != None):
@@ -66,7 +69,8 @@ class AIPlayer(Player):
 
     # Starts the Discard Phase for AI Players (analogous to startDiscard() in app.py)
     def startDiscard(self, game):
-        while not game.checkEndTurnConditions(self):
+        while self.countCards() > self.discardGoal:
+            print(1234)
             resources = game.checkDiscardConditions(self)
             nextDiscard = random.choice(resources)
             Button.discardHandler(game, ('discard', nextDiscard))
@@ -136,6 +140,9 @@ class AIPlayer(Player):
         
         elif (move == 'buildDevCard'):
             game.buildMode('devCard')
+        
+        elif (move == 'knight'):
+            game.robberMode()
     
     # Performs the move if the move is a road move.
     def doRoadMove(self, game, roads):
@@ -201,6 +208,9 @@ class AIPlayer(Player):
                 moves.append(('buildCity', validCities))
             if (devCard[1]):
                 moves.append(('buildDevCard', None))
+            devCardConditions = game.devCardChoiceConditions(self)
+            if ('knight' in devCardConditions and (game.dice1.value + game.dice2.value != 7)):
+                moves.append(('knight', None))
             return moves
 
     # Returns the legal roads to build

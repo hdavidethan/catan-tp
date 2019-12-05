@@ -352,6 +352,7 @@ class CatanGame(PygameGame):
     
     # Starts the round of discarding extra cards when 7 is rolled.
     def startDiscard(self):
+        print('started')
         self.discardMode = True
         self.currentPlayer = self.toDiscard.pop(0)
         player = self.board.players[self.currentPlayer]
@@ -585,6 +586,7 @@ class CatanGame(PygameGame):
 
     # Checks for the conditions to use any development card
     def devCardChoiceConditions(self, player):
+        conditions = []
         for devCard in player.devCards:
             if (devCard not in ['victoryPoint', 'monopoly', 'roadBuilding']):
                 count = player.devCards[devCard]
@@ -592,6 +594,8 @@ class CatanGame(PygameGame):
                     self.devCardElements[devCard].isDisabled = True
                 else:
                     self.devCardElements[devCard].isDisabled = False
+                    conditions.append(devCard)
+        return conditions
 
     # Checks if it is possible to discard certain resources. (i.e. is > 0)
     def checkDiscardConditions(self, player):
