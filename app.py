@@ -632,27 +632,19 @@ class CatanGame(PygameGame):
         setupRoads = (self.setupMode and 
                     (len(player.roads) < len(player.settlements)))
         roadCondition = (((not self.setupMode and roadResources and 
-                    settlementExists) and not self.discardMode
-                    and not self.inRobberMode and not self.inBuildMode
-                    and not self.yearOfPlentyMode and not self.stealMode) or setupRoads)
+                    settlementExists) and not self.discardMode) or setupRoads)
         # Settlement Conditions
         settlementResources = (player.resources['lumber'] >= 1 and player.resources['brick'] >= 1
                             and player.resources['grain'] >= 1 and player.resources['sheep'] >= 1)
         settlementCondition = ((settlementResources or (self.setupMode and
                             ((self.turn // self.playerCount == 1 and len(player.settlements) == 0) or
-                            (self.turn // self.playerCount == 0 and len(player.settlements) == 1)))) and not self.discardMode 
-                            and not self.inRobberMode and not self.inBuildMode
-                            and not self.yearOfPlentyMode and not self.stealMode)
+                            (self.turn // self.playerCount == 0 and len(player.settlements) == 1)))) and not self.discardMode)
         # City Conditions
         cityCondition = ((player.resources['ore'] >= 3 and player.resources['grain'] >= 2
-                            and len(player.settlements) > 0) and not self.discardMode 
-                            and not self.inRobberMode and not self.inBuildMode
-                        and not self.yearOfPlentyMode and not self.stealMode)
+                            and len(player.settlements) > 0) and not self.discardMode)
         # Dev Card Conditions
         devCardCondition = ((not self.setupMode and player.resources['sheep'] >= 1 and player.resources['ore'] >= 1 
-                            and player.resources['grain'] >= 1) and not self.discardMode 
-                            and not self.inRobberMode and not self.inBuildMode
-                            and not self.yearOfPlentyMode and not self.stealMode)
+                            and player.resources['grain'] >= 1) and not self.discardMode)
         # Compile conditions
         conditions = (('road', roadCondition), ('settlement', settlementCondition),
                     ('city', cityCondition), ('devCard', devCardCondition))

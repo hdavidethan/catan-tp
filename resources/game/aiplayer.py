@@ -39,6 +39,7 @@ class AIPlayer(Player):
                 actions = []
                 for key in moveDict:
                     actions.append(key)
+                print(actions)
                 if ('setup' in actions):
                     nextAction = 'setup'
                 elif ('buildRoad' in actions):
@@ -185,6 +186,7 @@ class AIPlayer(Player):
         else:
             self.setPriorityNode(game)
             road, settlement, city, devCard = game.checkBuildConditions(self)
+            print(road, settlement, city, devCard)
             moves = []
             if (road[1]):
                 validRoads = self.getLegalRoads(game)
@@ -197,6 +199,7 @@ class AIPlayer(Player):
                 moves.append(('buildCity', validCities))
             if (devCard[1]):
                 moves.append(('buildDevCard', None))
+            print(moves)
             return moves
 
     # Returns the legal roads to build
