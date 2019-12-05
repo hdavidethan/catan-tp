@@ -561,7 +561,7 @@ class CatanGame(PygameGame):
             longestRoad = 0
         player.victoryPoints = settlements + 2 * cities + longestRoad
 
-    # Checks if any player has achieved 10 victory points. Returns the player.
+    # Checks if any player has achieved the VP threshold. Returns the player.
     def checkVictory(self):
         for player in self.board.players:
             if (player.victoryPoints + player.devCards['victoryPoint'] >= Utils.VICTORY_POINT_THRESHOLD):
@@ -757,6 +757,8 @@ class CatanGame(PygameGame):
                 self.board.players[self.currentPlayer].devCards['knight'] += 1
             elif (key == pygame.K_F7):
                 self.fogOfWar = not self.fogOfWar
+            elif (key == pygame.K_v):
+                self.victoryMode = True
             self.checkBuildConditions(self.board.players[self.currentPlayer])
             self.useDevCardConditions(self.board.players[self.currentPlayer])
 

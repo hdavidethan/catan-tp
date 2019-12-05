@@ -1,10 +1,10 @@
 CATAN: The Settlers of Python
 
-This project is a python implementation of the popular board game Catan. The game
-allows players to add up to 3 other human or AI players. When playing against
-other human players, the game is done "hotseat" turn-based style, where each
-player takes turns on the same computer. For full immersion, it is recommended
-that all players only look at their own hands.
+This project is a Python game inspired by the award-winning board game Catan by
+Klaus Teuber. The game allows players to add up to 3 other human or AI players.
+When playing against other human players, the game is done "hotseat" turn-based
+style, where each player takes turns on the same computer. For full immersion,
+it is recommended that all players only look at their own hands.
 
 How to Run the Game?
 Open the app.py file in the root directory and run in Python 3.
